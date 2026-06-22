@@ -3,5 +3,13 @@
 {% block content %}
 <h1>Bracket Generator</h1>
 <p>Here is where you generate your brackets!</p>
+    <form method="POST" enctype="multipart/form-data">
+        <input type="text" name="name" placeholder="Tournament Name:" required>
+        <input type="text" name="description" placeholder="Enter a description" required>
+        <button type="submit">Generate Bracket</button>
+        <div class="back-link">
+            <a href="{{ url_for('index') }}">Back to Home</a>
+        </div>
+    </form>
 
 {% endblock %}
