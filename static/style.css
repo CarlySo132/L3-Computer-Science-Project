@@ -24,3 +24,7 @@ ul li a:hover{
     background-color: #003a74;
 }
 
+.card{
+    display: grid;
+}
+
