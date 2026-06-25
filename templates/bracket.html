@@ -12,4 +12,16 @@
         </div>
     </form>
 
+{% for round_num in [1, 2, 3, 4] %}
+<div class="round">
+    <h2>
+        {% if round_num  == 1 %} Round of 16
+        {% elif round_num == 2 %} Quarterfinals
+        {% elif round_num == 3 %} Semifinals
+        {% elif round_num == 4 %} Final
+        {% endif %}
+    </h2>
+{% for match in matches if match.round == round_num %}
+
+</div>
 {% endblock %}
