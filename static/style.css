@@ -9,9 +9,10 @@
   --green:     #1a6b2a;
   --green-bright: #22913a;
   --text:      #f0f0f0;
-  --muted:     #888;
+  --muted:     #d4d4d4;
   --radius:    6px;
-  --font-head: 'Barlow Condensed', sans-serif;
+  --font-head: 'Trebuchet MS', sans-serif;
+  --font-navbar: 'Barlow Condensed', sans-serif;
   --font-body: 'Inter', sans-serif;
 }
 
@@ -25,6 +26,7 @@ body {
   min-height: 100vh;
 }
 
+/* NAVBAR OVERALL */
 nav {
   position: sticky;
   top: 0;
@@ -43,7 +45,7 @@ nav .nav ul {
  
 nav .nav ul li a {
   display: block;
-  font-family: var(--font-head);
+  font-family: var(--font-navbar);
   font-weight: 700;
   font-size: 1rem;
   letter-spacing: 0.08em;
@@ -62,7 +64,8 @@ nav .nav ul li a::after {
   background: var(--red);
   transform: scaleX(0);
 }
- 
+
+/* NAVBAR WHEN BEING HOVERED ON */
 nav .nav ul li a:hover {
   color: var(--red);
   background: transparent;
@@ -70,6 +73,28 @@ nav .nav ul li a:hover {
  
 nav .nav ul li a:hover::after {
   transform: scaleX(1);
+}
+
+/* PUTS PAGE INTO LIMITS, DOESN'T ALLOW SIZEES BEYOND A CERTAIN AMOUNT */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-head);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+p {
+  color: var(--muted);
+  margin-bottom: 1rem;
+  font-weight: 300;
 }
 
 ul {
