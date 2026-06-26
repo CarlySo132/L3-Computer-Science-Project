@@ -27,6 +27,11 @@ ul li a:hover{
 .card{
     display: grid;
 }
-
+.card-title{
+    padding-top: 50px;
+    text-align: center;
+    font-size: 30px;
+    color: #003a74;
+}
 
 
