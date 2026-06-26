@@ -21,6 +21,15 @@
       bottom: 0;
       padding: 40px 20px 20px;
     }
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon{
+      filter: brightness(0);
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon:hover{
+      filter: brightness(0.5);
+    }
   </style>
 
 </head>
@@ -33,7 +42,7 @@
         <li>When your score is odd you must serve from the left side</li>
         <li>When your score is even you must serve from the right side</li>
     </div>
-<a href="{{ url_for('rules') }}">Back to Rules</a>
+<a href="{{ url_for('rules') }}" class="button-22">Back to Rules</a>
 
 
 <body>
@@ -81,7 +90,7 @@
     <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
-    </button>
+    </button> 
   </div>
 </body>
 
