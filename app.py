@@ -49,7 +49,7 @@ def setup():
 
     teams = Bracket.query.order_by(Bracket.seed).all()
 
-    for i in range(8):
+    for i in range(8):  
         match = Match(
             round=1,
             match_index=i,

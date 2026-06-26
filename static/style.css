@@ -1,3 +1,32 @@
+
+/* THIS PART IS BASICALLY SETTING UP VARIABLES TO STAY CONSISTENT IN STYLING */
+:root {
+  --bg:        #0a0a0a;
+  --surface:   #141414;
+  --surface-2: #1e1e1e;
+  --red:       #cc0000;
+  --red-dim:   #991a1a;
+  --green:     #1a6b2a;
+  --green-bright: #22913a;
+  --text:      #f0f0f0;
+  --muted:     #888;
+  --radius:    6px;
+  --font-head: 'Barlow Condensed', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+/* GENERAL BODY STYLE,  */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+
+
 ul {
     position: sticky;
     top: 0;
