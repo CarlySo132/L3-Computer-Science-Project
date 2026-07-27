@@ -10,21 +10,23 @@
             <a href="{{ url_for('badminton') }}"><div class="card-body">
                 <img src="{{ url_for('static', filename='L1110664.JPG') }}" class="card-img-top" alt="Badminton">
                 <h5 class="card-title">Badminton</h5>
-                <h6 class="card-sub mb-2 text-body-secondary">Rules for Badminton:</h6>
+                <h6 class="card-text">Rules for Badminton:</h6>
             </div>
             </a>
         </div>
     </div>
-
     <div class="col-sm-6 mb-3 mb-sm-0">
         <div class="card" style="width: 18rem;">
             <a href="{{ url_for('football') }}"><div class="card-body">
                 <img src="{{ url_for('static', filename='images (2).jpeg')}}" class="card-img-top" alt="Football">
                 <h5 class="card-title">Football</h5>
-                <h6 class="card-sub mb-2 text-body-secondary">Rules for Football:</h6>
+                <h6 class="card-text">Rules for Football:</h6>
             </div>
             </a>
         </div>
     </div> 
 </div>
+
+
+</style>
 {% endblock %}

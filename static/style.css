@@ -1,7 +1,7 @@
 
 /* THIS PART IS BASICALLY SETTING UP VARIABLES TO STAY CONSISTENT IN STYLING */
 :root {
-  --bg:        #0a0a0a;
+  --bg:        #000000dc;
   --surface:   #141414;
   --surface-2: #1e1e1e;
   --red:       #cc0000;
@@ -26,11 +26,10 @@ body {
   min-height: 100vh;
 }
 
-/* NAVBAR OVERALL */
 nav {
   position: sticky;
   top: 0;
-  background-color: #000;
+  background-color: #000000dc;
   border-bottom: 2px solid var(--red);
 }
  
@@ -56,7 +55,7 @@ nav .nav ul li a {
   position: relative;
 }
  
-nav .nav ul li a::after {
+nav .nav ul li a:after {
   content: '';
   position: absolute;
   bottom: 0; left: 0; right: 0;
@@ -131,16 +130,17 @@ ul li a:hover{
     height: 100%;
 }
 .card-title{
-    padding-top: 50px;
+    padding-top: 30px;
     text-align: center;
     font-size: 30px;
     color: #22913a;
 }
 
-.card-text {
+.card-text{
     transform: translateY(-10px);
     transition: transform 1s ease;
-    opacity: 0%;
+    text-align: center;
+    padding-top: 10px;
 }
 
 a {
@@ -148,17 +148,44 @@ a {
     color: #22913a;
 }
 
-
-/* CARD WHEN BEING HOVERED OVER */
 .card:hover{
-    transform: translateY(-40px);
-    height: 110%;
+    transform: translateY(-10px);
+    height: 100%;
     transition: height 0.5s ease;
-    transition: transform 1s ease;
+    transition: transform 0.5s ease;
 }
 
-.card:hover .card-title {
+.card:hover .card-title .card-text{
     transform: translateY(-10px);
     transition: transform 1s ease;
 }
 
+.carousel-item {
+    position: relative;
+}
+
+.carousel-caption {
+background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+left: 0;
+right: 0;
+bottom: 0;
+padding: 40px 20px 20px;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon{
+    filter: brightness(0);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon:hover{
+    filter: brightness(0.5);
+}
+
+.row {
+    padding-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
