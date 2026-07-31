@@ -35,6 +35,10 @@ def bracket():
     matches = Match.query.order_by(Match.round, Match.match_index).all()
     return render_template('bracket.html', teams=teams, matches=matches)
 
+@app.route("/practice")
+def practice():
+    return render_template('practice.html')
+
 @app.route("/setup", methods=["POST"])
 def setup():
     Match.query.delete()
