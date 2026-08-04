@@ -1,28 +1,26 @@
 {% extends 'base.html' %}
 
 {% block content%}
-<div class="container">
-    <h1 class="page-title">Rules</h1>
-    <p>Here are the rules for the different sports to inform the players in advance.</p>
 
-    <div class="row">    
-        <div class="card">
-            <img src="{{ url_for('static', filename='L1110664.JPG') }}" class="card-img-top" alt="Badminton">
-            <div class="card-body">
-                <h5 class="card-title">Badminton</h5>
-                <p class="card-sub">Rules for Badminton:</h6>
-                <a href="{{ url_for('badminton') }}" class="class-link">View Rules</a>
-            </div>
+<h1 class="page-title">Rules</h1>
+<p>Here are the rules for the different sports to inform the players in advance.</p>
+
+<div class="card-container">    
+    <div class="card">
+        <img src="{{ url_for('static', filename='L1110664.JPG') }}" class="card-img-top" alt="Badminton">
+        <div class="card-content">
+            <h5>Badminton</h5>
+            <p>Rules for Badminton:</p>
+            <a href="{{ url_for('badminton') }}" class="btn">View Rules</a>
         </div>
-
-        <div class="card">
-            <img src="{{ url_for('static', filename='images (2).jpeg')}}" class="card-img-top" alt="Football">
-            <div class="card-body">     
-                <h5 class="card-title">Football</h5>
-                <p class="card-sub">Rules for Football:</p>
-                <a href="{{ url_for('football') }}" class="class-link">View Rules</a>
-            </div>
-        </div> 
+    </div>
+    <div class="card">
+        <img src="{{ url_for('static', filename='images (2).jpeg')}}" class="card-img-top" alt="Football">
+        <div class="card-content">
+            <h5>Football</h5>
+            <p>Rules for Football:</p>
+            <a href="{{ url_for('football') }}" class="btn">View Rules</a>
+        </div>
     </div>
 </div>
 

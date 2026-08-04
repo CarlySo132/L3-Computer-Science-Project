@@ -2,7 +2,7 @@ from flask import Flask, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Bracket.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bracket.db'
 db = SQLAlchemy(app)
 
 class Bracket(db.Model):
@@ -34,10 +34,6 @@ def bracket():
     teams = Bracket.query.all()
     matches = Match.query.order_by(Match.round, Match.match_index).all()
     return render_template('bracket.html', teams=teams, matches=matches)
-
-@app.route("/practice")
-def practice():
-    return render_template('practice.html')
 
 @app.route("/setup", methods=["POST"])
 def setup():
@@ -88,6 +84,7 @@ def football():
     return render_template('football.html')
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
+
+with app.app_context():
+    db.create_all()
