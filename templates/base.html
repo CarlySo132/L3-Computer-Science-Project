@@ -11,9 +11,9 @@
 <body>
     <nav>
         <ul class="nav-links"> 
-            <li><a href="{{ url_for( 'index' )}}">Home</a></li>
-            <li><a href="{{ url_for('bracket')}}">Generator</a></li>
-            <li><a href="{{ url_for('rules')}}">Rules</a></li>
+            <li><a href="{{ url_for( 'index' )}}"{% if request.endpoint == 'index' %} class="active"{% endif %}>Home</a></li>
+            <li><a href="{{ url_for('bracket')}}"{% if request.endpoint == 'bracket' %} class="active"{% endif %}>Generator</a></li>
+            <li><a href="{{ url_for('rules')}}"{% if request.endpoint == 'rules' %} class="active"{% endif %}>Rules</a></li>
         </ul>
         <button id="theme-toggle">Light Mode</button>
     </nav>

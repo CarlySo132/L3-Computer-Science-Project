@@ -95,12 +95,7 @@ nav ul li a {
   padding: 1rem 1.5rem;
   text-decoration: none;
   position: relative;
-  transition: color 0.3s ease;
-}
-
-/* NAVBAR WHEN BEING HOVERED ON */
-nav ul li a:hover {
-  color: var(--accent);
+  transition: color 0.5s ease;
 }
 
 nav ul li a::after {
@@ -112,11 +107,20 @@ nav ul li a::after {
   height: 2px;
   background-color: var(--accent);
   transform: scaleX(0);
-  transition: transform 0.3s ease;
+  transition: transform 0.5s ease;
 }
 
-nav ul li a:hover::after {
+nav ul li a:hover::after,
+nav ul li a.active::after {
   transform: scaleX(1);
+}
+/* NAVBAR WHEN BEING HOVERED ON */
+nav ul li a:hover {
+  color: var(--accent);
+}
+
+nav ul li a.active{
+  color: var(--accent);
 }
 
 #theme-toggle {
