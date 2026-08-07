@@ -113,7 +113,8 @@ nav ul li a::after {
 nav ul li a:hover::after,
 nav ul li a.active::after {
   transform: scaleX(1);
-}
+}  
+
 /* NAVBAR WHEN BEING HOVERED ON */
 nav ul li a:hover {
   color: var(--accent);
@@ -123,6 +124,7 @@ nav ul li a.active{
   color: var(--accent);
 }
 
+/* LIGHT AND DARK MODE TOGGLE */
 #theme-toggle {
   background: var(--accent);  
   color: white;
