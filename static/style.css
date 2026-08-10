@@ -16,6 +16,7 @@
   --muted: #9C968C;
   --red: #D97070;
   --green: #7BA88F;
+  --light-dark: white;
   --radius: 6px;
   --font-head: 'Trebuchet MS', sans-serif;
   --font-navbar: 'Barlow Condensed', sans-serif;
@@ -41,6 +42,7 @@ body.light-mode {
   --accent-dim: rgba(217, 112, 112, 0.15);
   --text: #3D3118;
   --muted: #6B6245;
+  --light-dark: #332914;
   --red: #D97070;
   --green: #7BA88F;
 }
@@ -118,34 +120,90 @@ nav ul li a.active::after {
 /* NAVBAR WHEN BEING HOVERED ON */
 nav ul li a:hover {
   color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 nav ul li a.active{
   color: var(--accent);
 }
 
-/* LIGHT AND DARK MODE TOGGLE */
-#theme-toggle {
-  background: var(--accent);  
+/*button for lght and dark mode */
+.theme-button-wrapper{
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--accent);
+  border-radius: 100px;
   color: white;
-  border: None;
-  border-radius: 6px;
-  padding: 8px 16px;
+  overflow: hidden;
+  box-shadow: none;
+  outline: #000000;
+}
+
+.theme-icon-btn i{
+  background: var(--accent);
+  color: var(--light-dark);
+  border: none;
+  padding: 10px 12px;
   cursor: pointer;
-  font-family: inherit;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+
+.theme-icon-btn{
+  border: none;
+}
+
+.theme-icon-btn i:hover {
+  color: var(--bg);
+  transition: 0.5s ease;
+}
+
+.theme-button-wrapper:hover{
+  border: none;
+  transform: scale(0.98);
+  transition: 0.4s ease;
+}
+
+
+.theme-text-btn{
+  background: var(--accent);
+  color: var(--light-dark);
+  border: none;
+  padding: 10px 4px;
+  cursor: pointer;
   font-weight: 600;
   font-size: 13px;
-  text-transform: uppercase;
   white-space: nowrap;
-  transition: opacity 0.3s ease;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
 }
 
-#theme-toggle:hover {
-  opacity: 0.8;
+.theme-text-btn:hover{
+  color:  var(--bg);
+  transition: 0.5s ease;
 }
 
-#theme-toggle:active {
-  opacity: 0.6;
+.theme-text-wrapper {
+  display: flex;
+  width: 0;
+  overflow: hidden;
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.theme-button-wrapper.expanded .theme-text-wrapper {
+  width: 110px;
+}
+
+.theme-text-wrapper-inner {
+  display: flex;
+  align-items: center;
 }
 
 h1  {
