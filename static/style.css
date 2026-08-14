@@ -213,15 +213,35 @@ p {
 }
 
 .carousel-item {
-    position: relative;
+  position: relative;
+  height: 400px; /* pick whatever fits your layout */
+  overflow: hidden;
+}
+
+.carousel-item img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.carousel-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 45%;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7) 90%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .carousel-caption {
-background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-left: 0;
-right: 0;
-bottom: 0;
-padding: 40px 20px 20px;
+  z-index: 2; /* sits above the gradient */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 40px 20px 20px;
 }
 
 .carousel-control-prev-icon,
@@ -232,6 +252,10 @@ padding: 40px 20px 20px;
 .carousel-control-prev-icon,
 .carousel-control-next-icon:hover{
     filter: brightness(0.5);
+}
+
+#carouselSignals .carousel-item img {
+  object-fit: contain;
 }
 
 .row {
