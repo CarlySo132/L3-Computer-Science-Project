@@ -97,7 +97,7 @@
       </button>
     </h2>
     <div id="v2-collapseOne" class="accordion-collapse collapse show">
-      <div class="accordion-body">The winner in a badminton match is whichever team gets to <strong>21 points</strong> first, and they must win by a 2 point lead. Exemplar, if the score is 21-13 then <strong>the player with 21 won.</strong> However if the score were to be 20-20, then someone gets 21, the match <strong>isn't over yet</strong> it is only once one of the two players reaches a two point lead. An example being 21-23 or 30-32, the match will continue as long as it takes until there is a two point lead, in which, the player has then won.</div>
+      <div class="accordion-body">To win, a team must reach <a href="#" data-bs-toggle="tooltip" data-bs-title="First to 21 points wins, unless the score reaches 20-20">21 points</a> with a <a href="#" data-bs-toggle="tooltip" data-bs-title="At 20-20, play continues until one team leads by 2, e.g. 22-20 or 30-28">2 point lead</a>.</div>
     </div>
   </div>
 
@@ -210,5 +210,10 @@
 <body>
 
 </body>
+
+<script>
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>
 
 {% endblock %}
