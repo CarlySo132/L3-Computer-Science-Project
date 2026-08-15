@@ -13,19 +13,27 @@
       background-color: var(--surface);
     }
 
+    .accordion-v2 {
+      --bs-accordion-bg: var(--bg);
+      --bs-accordion-active-bg: var(--bg);
+      --bs-accordion-btn-bg: var(--bg);
+      --bs-accordion-color: var(--text);
+      --bs-accordion-active-color: var(--text);
+    }
+
     .accordion-v2 .accordion-item {
-      background: transparent;
+      background-color: var(--bg);
       border: none;
       margin-bottom: 14px;
     }
 
     .accordion-v2 .accordion-button {
-      background-color: var(--surface);
-      color: var(--text);
+      background-color: var(--bg);
+      color: var(--text) !important;
       font-family: var(--font-head);
       text-transform: uppercase;
       letter-spacing: 0.03em;
-      border-radius: 999px !important;
+      border-radius: 0 !important;
       padding: 14px 24px;
       border-left: 4px solid transparent;
     }
@@ -39,16 +47,22 @@
     }
 
     .accordion-v2 .accordion-button:not(.collapsed) {
-      background-color: var(--surface-2);
+      background-color: var(--bg);
       border-left: 4px solid var(--red);
       box-shadow: none;
-      border-radius: var(--radius) var(--radius) 0 0 !important;
+      border-radius: 0 !important;
     }
 
     .accordion-v2 .accordion-body {
-      background-color: var(--surface-2);
-      border-radius: 0 0 var(--radius) var(--radius);
+      background-color: var(--bg);
+      color: var(--text);
+      border-radius: 0;
       border-left: 4px solid var(--red);
+    }
+
+    .accordion-v2 .accordion-body p,
+    .accordion-v2 .accordion-body strong {
+      color: var(--text);
     }
 
     .accordion-v2 .accordion-button:focus {
