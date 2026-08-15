@@ -2,90 +2,9 @@
 
 {% block content %}
 
-
 <head>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-  <style>
-    #carouselSignals .carousel-item img,
-    #carouselExampleCaptions .carousel-item img {
-      object-fit: contain;
-      background-color: #ffffff;
-    }
-
-    #carouselSignals .carousel-item,
-    #carouselExampleCaptions .carousel-item {
-      background-color: #ffffff;
-    }
-
-    #carouselSignals .carousel-caption,
-    #carouselExampleCaptions .carousel-caption {
-      color: #ffffff;
-    }
-
-    #carouselSignals .carousel-caption h5,
-    #carouselExampleCaptions .carousel-caption h5,
-    #carouselSignals .carousel-caption p,
-    #carouselExampleCaptions .carousel-caption p {
-      color: #ffffff;
-    }
-
-    .accordion-v2 {
-      --bs-accordion-bg: #ffffff;
-      --bs-accordion-active-bg: #ffffff;
-      --bs-accordion-btn-bg: #ffffff;
-      --bs-accordion-color: #111111;
-      --bs-accordion-active-color: #111111;
-    }
-
-    .accordion-v2 .accordion-item {
-      background-color: #ffffff;
-      border: none;
-      margin-bottom: 14px;
-    }
-
-    .accordion-v2 .accordion-button {
-      background-color: #ffffff;
-      color: #111111 !important;
-      font-family: var(--font-head);
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      border-radius: 0 !important;
-      padding: 14px 24px;
-      border-left: 4px solid transparent;
-    }
-
-    .accordion-v2 .accordion-button::before {
-      content: attr(data-num);
-      color: var(--green-bright);
-      font-family: var(--font-head);
-      margin-right: 14px;
-      font-weight: 800;
-    }
-
-    .accordion-v2 .accordion-button:not(.collapsed) {
-      background-color: #ffffff;
-      border-left: 4px solid var(--red);
-      box-shadow: none;
-      border-radius: 0 !important;
-    }
-
-    .accordion-v2 .accordion-body {
-      background-color: #ffffff;
-      color: #111111;
-      border-radius: 0;
-      border-left: 4px solid var(--red);
-    }
-
-    .accordion-v2 .accordion-body p,
-    .accordion-v2 .accordion-body strong {
-      color: #111111;
-    }
-
-    .accordion-v2 .accordion-button:focus {
-      box-shadow: none;
-    }
-  </style>
 </head>
 <h1>Badminton Rules</h1>
 
@@ -205,11 +124,6 @@
 </div>
 
 <a href="{{ url_for('rules') }}" class="button-22">Back to Rules</a>
-
-
-<body>
-
-</body>
 
 <script>
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')

@@ -215,6 +215,7 @@ p {
   position: relative;
   height: 400px; /* pick whatever fits your layout */
   overflow: hidden;
+  background-color: var(--surface);
 }
 
 .carousel-item img {
@@ -241,6 +242,12 @@ p {
   right: 0;
   bottom: 0;
   padding: 40px 20px 20px;
+  color: var(--text);
+}
+
+.carousel-caption h5,
+.carousel-caption p {
+  color: var(--text);
 }
 
 .carousel-control-prev-icon,
@@ -253,7 +260,8 @@ p {
     filter: brightness(0.5);
 }
 
-#carouselSignals .carousel-item img {
+#carouselSignals .carousel-item img,
+#carouselExampleCaptions .carousel-item img {
   object-fit: contain;
 }
 
@@ -263,6 +271,63 @@ p {
     flex-wrap: wrap;
     margin-right: -15px;
     margin-left: -15px;
+}
+
+/* ACCORDION VERSION 2 - dark mode, square corners, multiple sections open */
+.accordion-v2 {
+  --bs-accordion-bg: var(--surface);
+  --bs-accordion-active-bg: var(--surface-2);
+  --bs-accordion-btn-bg: var(--surface);
+  --bs-accordion-color: var(--text);
+  --bs-accordion-active-color: var(--text);
+}
+
+.accordion-v2 .accordion-item {
+  background-color: var(--surface);
+  border: none;
+  margin-bottom: 14px;
+}
+
+.accordion-v2 .accordion-button {
+  background-color: var(--surface);
+  color: var(--text) !important;
+  font-family: var(--font-head);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-radius: 0 !important;
+  padding: 14px 24px;
+  border-left: 4px solid transparent;
+}
+
+.accordion-v2 .accordion-button::before {
+  content: attr(data-num);
+  color: var(--green-bright);
+  font-family: var(--font-head);
+  margin-right: 14px;
+  font-weight: 800;
+}
+
+.accordion-v2 .accordion-button:not(.collapsed) {
+  background-color: var(--surface-2);
+  border-left: 4px solid var(--red);
+  box-shadow: none;
+  border-radius: 0 !important;
+}
+
+.accordion-v2 .accordion-body {
+  background-color: var(--surface-2);
+  color: var(--text);
+  border-radius: 0;
+  border-left: 4px solid var(--red);
+}
+
+.accordion-v2 .accordion-body p,
+.accordion-v2 .accordion-body strong {
+  color: var(--text);
+}
+
+.accordion-v2 .accordion-button:focus {
+  box-shadow: none;
 }
 
 /* TOOLTIP LINKS INSIDE ACCORDION BODY */
@@ -278,15 +343,16 @@ p {
 
 /* BOOTSTRAP TOOLTIP POPUP ITSELF */
 .tooltip .tooltip-inner {
-  background-color: #111111;
-  color: #ffffff;
+  background-color: var(--surface);
+  color: var(--text);
   font-family: var(--font-body);
   font-size: 13px;
   padding: 8px 12px;
   max-width: 220px;
   border-radius: var(--radius);
+  border: 1px solid var(--red-dim);
 }
 
 .tooltip .tooltip-arrow::before {
-  border-top-color: #111111;
+  border-top-color: var(--surface);
 }
