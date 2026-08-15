@@ -16,6 +16,11 @@
 }
 
 /* GENERAL BODY STYLE,  */
+html {
+  background-color: var(--bg);
+  min-height: 100%;
+}
+
 body {
   background-color: var(--bg);
   color: var(--text);
@@ -195,7 +200,7 @@ p {
 .container{
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem; 
+  padding: 2rem;
 }
 
 .row{
