@@ -6,85 +6,136 @@
 <head>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+  <style>
+    #carouselSignals .carousel-item img,
+    #carouselExampleCaptions .carousel-item img {
+      object-fit: contain;
+      background-color: var(--surface);
+    }
+
+    .accordion-v2 .accordion-item {
+      background: transparent;
+      border: none;
+      margin-bottom: 14px;
+    }
+
+    .accordion-v2 .accordion-button {
+      background-color: var(--surface);
+      color: var(--text);
+      font-family: var(--font-head);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border-radius: 999px !important;
+      padding: 14px 24px;
+      border-left: 4px solid transparent;
+    }
+
+    .accordion-v2 .accordion-button::before {
+      content: attr(data-num);
+      color: var(--green-bright);
+      font-family: var(--font-head);
+      margin-right: 14px;
+      font-weight: 800;
+    }
+
+    .accordion-v2 .accordion-button:not(.collapsed) {
+      background-color: var(--surface-2);
+      border-left: 4px solid var(--red);
+      box-shadow: none;
+      border-radius: var(--radius) var(--radius) 0 0 !important;
+    }
+
+    .accordion-v2 .accordion-body {
+      background-color: var(--surface-2);
+      border-radius: 0 0 var(--radius) var(--radius);
+      border-left: 4px solid var(--red);
+    }
+
+    .accordion-v2 .accordion-button:focus {
+      box-shadow: none;
+    }
+  </style>
 </head>
 <h1>Badminton Rules</h1>
 
-<div class="accordion accordion-flush" id="accordionFlushExample">
+<div class="accordion accordion-v2" id="accordionVersionTwo">
   <div class="accordion-item">
     <h2 class="accordion-header">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+      <button class="accordion-button" type="button" data-num="01" data-bs-toggle="collapse" data-bs-target="#v2-collapseOne" aria-expanded="true" aria-controls="v2-collapseOne">
         How to win
       </button>
     </h2>
-    <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+    <div id="v2-collapseOne" class="accordion-collapse collapse show">
       <div class="accordion-body">The winner in a badminton match is whichever team gets to <strong>21 points</strong> first, and they must win by a 2 point lead. Exemplar, if the score is 21-13 then <strong>the player with 21 won.</strong> However if the score were to be 20-20, then someone gets 21, the match <strong>isn't over yet</strong> it is only once one of the two players reaches a two point lead. An example being 21-23 or 30-32, the match will continue as long as it takes until there is a two point lead, in which, the player has then won.</div>
     </div>
   </div>
+
   <div class="accordion-item">
     <h2 class="accordion-header">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
-        IN VS OUTs 
+      <button class="accordion-button collapsed" type="button" data-num="02" data-bs-toggle="collapse" data-bs-target="#v2-collapseTwo" aria-expanded="false" aria-controls="v2-collapseTwo">
+        In vs Out
       </button>
     </h2>
-    <div id="flush-collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+    <div id="v2-collapseTwo" class="accordion-collapse collapse">
       <div class="accordion-body">
-        <h2 class="card-title">Badminton Court and Serving rules </h2>
-          <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-indicators">
-              <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-              <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
-              <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
-              <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="3" aria-label="Slide 4"></button>
-            </div>
-            <div class="carousel-inner">
-              <div class="carousel-item active">
-                <img src="/static/singles-court.png" class="d-block w-100" alt="Singles court">
-                <div class="carousel-caption d-none d-md-block">
-                  <h5>Singles court</h5>
-                  <p>Tramlines are out — use the inner sidelines.</p>
-                </div>
-              </div>
-              <div class="carousel-item">
-                <img src="/static/doubles-court.png" class="d-block w-100" alt="Doubles court">
-                <div class="carousel-caption d-none d-md-block">
-                  <h5>Doubles court</h5>
-                  <p>Full width is in — use the outer sidelines.</p>
-                </div>
-              </div>
-              <div class="carousel-item">
-                <img src="/static/singles-serve.png" class="d-block w-100" alt="Singles serve">
-                <div class="carousel-caption d-none d-md-block">
-                  <h5>Singles serve</h5>
-                  <p>Serve diagonally into the long narrow box.</p>
-                </div>
-              </div>
-              <div class="carousel-item">
-                <img src="/static/doubles-serve.png" class="d-block w-100" alt="Doubles serve">
-                <div class="carousel-caption d-none d-md-block">
-                  <h5>Doubles serve</h5>
-                  <p>Short & wide — the back tramline is out.</p>
-                </div>
-              </div>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
-            </button> 
+        <h2 class="card-title">Badminton Court and Serving rules</h2>
+        <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="3" aria-label="Slide 4"></button>
           </div>
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img src="/static/singles-court.png" class="d-block w-100" alt="Singles court">
+              <div class="carousel-caption d-none d-md-block">
+                <h5>Singles court</h5>
+                <p>Tramlines are out — use the inner sidelines.</p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="/static/doubles-court.png" class="d-block w-100" alt="Doubles court">
+              <div class="carousel-caption d-none d-md-block">
+                <h5>Doubles court</h5>
+                <p>Full width is in — use the outer sidelines.</p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="/static/singles-serve.png" class="d-block w-100" alt="Singles serve">
+              <div class="carousel-caption d-none d-md-block">
+                <h5>Singles serve</h5>
+                <p>Serve diagonally into the long narrow box.</p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="/static/doubles-serve.png" class="d-block w-100" alt="Doubles serve">
+              <div class="carousel-caption d-none d-md-block">
+                <h5>Doubles serve</h5>
+                <p>Short & wide — the back tramline is out.</p>
+              </div>
+            </div>
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
+
   <div class="accordion-item">
     <h2 class="accordion-header">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseSignals" aria-expanded="false" aria-controls="flush-collapseSignals">
+      <button class="accordion-button collapsed" type="button" data-num="03" data-bs-toggle="collapse" data-bs-target="#v2-collapseSignals" aria-expanded="false" aria-controls="v2-collapseSignals">
         In vs Out Hand Signals
       </button>
     </h2>
-    <div id="flush-collapseSignals" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+    <div id="v2-collapseSignals" class="accordion-collapse collapse">
       <div class="accordion-body">
         <h2 class="card-title">Umpire Hand Signals</h2>
         <div id="carouselSignals" class="carousel slide" data-bs-ride="carousel">
