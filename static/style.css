@@ -589,66 +589,103 @@ p {
   text-transform: uppercase;
 }
 
-/* BRACKET LAYOUT - rounds sit side by side as columns */
-.bracket-wrapper {
+/* VERTICAL TIMELINE BRACKET */
+.bracket-timeline {
+  max-width: 700px;
+}
+
+.timeline-round {
   display: flex;
-  gap: 2rem;
-  overflow-x: auto;
-  padding-bottom: 1rem;
+  gap: 20px;
 }
 
-.round {
-  flex: 0 0 220px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.round h2 {
-  font-size: 16px;
-  margin-bottom: 4px;
-}
-
-/* MATCH + TEAM CARDS */
-.match {
+.timeline-marker {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  flex: 0 0 auto;
 }
 
-.team {
+.timeline-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  flex-shrink: 0;
+}
+
+.timeline-line {
+  width: 2px;
+  flex: 1;
+  background-color: var(--border);
+  margin-top: 4px;
+}
+
+.timeline-content {
+  flex: 1;
+  padding-bottom: 32px;
+}
+
+.timeline-content h3 {
+  margin-bottom: 12px;
+}
+
+.timeline-matches {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.timeline-match {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   background-color: var(--card);
   border: 1px solid var(--border);
-  color: var(--text);
-  padding: 10px 12px;
-  font-size: 14px;
-  border-radius: 4px;
+  border-radius: var(--radius);
+  padding: 10px 14px;
 }
 
-.team-tbd {
+.timeline-team {
+  color: var(--text);
+  font-size: 14px;
+  flex: 1;
+}
+
+.timeline-team-tbd {
   color: var(--muted);
   font-style: italic;
 }
 
-.team-form {
-  margin: 0;
+.timeline-vs {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  flex: 0 0 auto;
 }
 
-.team-button {
-  display: block;
+.timeline-team-form {
+  margin: 0;
+  flex: 1;
+}
+
+.timeline-team-button {
   width: 100%;
   text-align: left;
+  background: none;
+  border: none;
   cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  padding: 4px 8px;
+  border-radius: 3px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.team-button:hover {
-  border-color: var(--accent);
+.timeline-team-button:hover {
   background-color: var(--accent-dim);
+  color: var(--accent);
 }
 
-.team.winner {
-  border-color: var(--green);
-  background-color: rgba(123, 168, 143, 0.15);
+.timeline-team.winner {
+  color: var(--green);
   font-weight: 700;
 }

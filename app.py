@@ -1,9 +1,12 @@
+import math
 from flask import Flask, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bracket.db'
 db = SQLAlchemy(app)
+
+ALLOWED_SIZES = [4, 8, 16]
 
 class Bracket(db.Model):
     __tablename__ = 'teams'
@@ -24,6 +27,17 @@ class Match(db.Model):
     team2 = db.relationship('Bracket', foreign_keys=[team2_id])
     winner = db.relationship('Bracket', foreign_keys=[winner_id])
 
+def round_label(round_num, total_rounds, num_teams):
+    """Returns a human-readable label for a given round number."""
+    if round_num == total_rounds:
+        return "Final"
+    if round_num == total_rounds - 1:
+        return "Semifinals"
+    if round_num == total_rounds - 2:
+        return "Quarterfinals"
+    participants = num_teams // (2 ** (round_num - 1))
+    return f"Round of {participants}"
+
 @app.route("/")
 def index():
     return render_template('index.html')
@@ -32,14 +46,39 @@ def index():
 def bracket():
     teams = Bracket.query.all()
     matches = Match.query.order_by(Match.round, Match.match_index).all()
-    return render_template('bracket.html', teams=teams, matches=matches)
+
+    num_teams = len(teams)
+    total_rounds = int(math.log2(num_teams)) if num_teams >= 2 else 0
+
+    rounds = []
+    for r in range(1, total_rounds + 1):
+        rounds.append({
+            "number": r,
+            "label": round_label(r, total_rounds, num_teams),
+            "matches": [m for m in matches if m.round == r]
+        })
+
+    final_match = matches[-1] if matches and matches[-1].round == total_rounds else None
+
+    return render_template(
+        'bracket.html',
+        teams=teams,
+        rounds=rounds,
+        num_teams=num_teams,
+        allowed_sizes=ALLOWED_SIZES,
+        final_match=final_match
+    )
 
 @app.route("/setup", methods=["POST"])
 def setup():
+    team_count = int(request.form.get("team_count", 8))
+    if team_count not in ALLOWED_SIZES:
+        team_count = 8
+
     Match.query.delete()
     Bracket.query.delete()
 
-    for i in range(1, 9):
+    for i in range(1, team_count + 1):
         name = request.form.get(f"team{i}", f"Team {i}")
         team = Bracket(name=name, seed=i)
         db.session.add(team)
@@ -47,9 +86,11 @@ def setup():
     db.session.commit()
 
     teams = Bracket.query.order_by(Bracket.seed).all()
+    total_rounds = int(math.log2(team_count))
 
-    # 8 teams -> round 1 is Quarterfinals (4 matches)
-    for i in range(4):
+    # Round 1 matches are filled with the actual teams.
+    first_round_matches = team_count // 2
+    for i in range(first_round_matches):
         match = Match(
             round=1,
             match_index=i,
@@ -58,10 +99,12 @@ def setup():
         )
         db.session.add(match)
 
-    for round_num, count in [(2, 2), (3, 1)]:
-        for i in range(count):
+    # Every later round starts empty and fills in as winners advance.
+    for r in range(2, total_rounds + 1):
+        matches_in_round = team_count // (2 ** r)
+        for i in range(matches_in_round):
             match = Match(
-                round=round_num,
+                round=r,
                 match_index=i,
                 team1_id=None,
                 team2_id=None

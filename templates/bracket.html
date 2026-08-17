@@ -4,11 +4,20 @@
 <h1>Bracket Generator</h1>
 <p>Here is where you generate your brackets!</p>
 
-<form action="/setup" method="POST" class="setup-form">
-    {% for i in range(1, 9) %}
+<form action="/setup" method="POST" class="setup-form" id="setup-form">
     <div class="setup-field">
+        <label for="team_count">Number of teams:</label>
+        <select id="team_count" name="team_count">
+            {% for size in allowed_sizes %}
+            <option value="{{ size }}" {% if size == 8 %}selected{% endif %}>{{ size }} teams</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {% for i in range(1, 17) %}
+    <div class="setup-field team-input" data-team-index="{{ i }}">
         <label for="team{{ i }}">Team {{ i }}:</label>
-        <input type="text" id="team{{ i }}" name="team{{ i }}" placeholder="Enter team name" required>
+        <input type="text" id="team{{ i }}" name="team{{ i }}" placeholder="Enter team name">
     </div>
     {% endfor %}
 
@@ -18,7 +27,6 @@
     </div>
 </form>
 
-{% set final_match = matches | selectattr('round', 'equalto', 3) | first %}
 {% if final_match and final_match.winner_id %}
 <div class="champion-banner">
     <span class="champion-label">Champion</span>
@@ -26,50 +34,77 @@
 </div>
 {% endif %}
 
-<div class="bracket-wrapper">
-{% for round_num in [1, 2, 3] %}
-<div class="round">
-    <h2>
-        {% if round_num == 1 %} Quarterfinals
-        {% elif round_num == 2 %} Semifinals
-        {% elif round_num == 3 %} Final
-        {% endif %}
-    </h2>
-    {% for match in matches if match.round == round_num %}
-    <div class="match">
-
-        {% if match.team1_id %}
-            {% if match.winner_id %}
-                <div class="team {% if match.winner_id == match.team1_id %}winner{% endif %}">
-                    {{ match.team1.name }}
-                </div>
-            {% else %}
-                <form action="{{ url_for('declare_winner', match_id=match.id, winner_id=match.team1_id) }}" method="POST" class="team-form">
-                    <button type="submit" class="team team-button">{{ match.team1.name }}</button>
-                </form>
-            {% endif %}
-        {% else %}
-            <div class="team team-tbd">TBD</div>
-        {% endif %}
-
-        {% if match.team2_id %}
-            {% if match.winner_id %}
-                <div class="team {% if match.winner_id == match.team2_id %}winner{% endif %}">
-                    {{ match.team2.name }}
-                </div>
-            {% else %}
-                <form action="{{ url_for('declare_winner', match_id=match.id, winner_id=match.team2_id) }}" method="POST" class="team-form">
-                    <button type="submit" class="team team-button">{{ match.team2.name }}</button>
-                </form>
-            {% endif %}
-        {% else %}
-            <div class="team team-tbd">TBD</div>
-        {% endif %}
-
+{% if rounds %}
+<div class="bracket-timeline">
+{% for round in rounds %}
+<div class="timeline-round">
+    <div class="timeline-marker">
+        <span class="timeline-dot"></span>
+        {% if not loop.last %}<span class="timeline-line"></span>{% endif %}
     </div>
-    {% endfor %}
+    <div class="timeline-content">
+        <h3>{{ round.label }}</h3>
+        <div class="timeline-matches">
+        {% for match in round.matches %}
+        <div class="timeline-match">
+
+            {% if match.team1_id %}
+                {% if match.winner_id %}
+                    <span class="timeline-team {% if match.winner_id == match.team1_id %}winner{% endif %}">{{ match.team1.name }}</span>
+                {% else %}
+                    <form action="{{ url_for('declare_winner', match_id=match.id, winner_id=match.team1_id) }}" method="POST" class="timeline-team-form">
+                        <button type="submit" class="timeline-team timeline-team-button">{{ match.team1.name }}</button>
+                    </form>
+                {% endif %}
+            {% else %}
+                <span class="timeline-team timeline-team-tbd">TBD</span>
+            {% endif %}
+
+            <span class="timeline-vs">vs</span>
+
+            {% if match.team2_id %}
+                {% if match.winner_id %}
+                    <span class="timeline-team {% if match.winner_id == match.team2_id %}winner{% endif %}">{{ match.team2.name }}</span>
+                {% else %}
+                    <form action="{{ url_for('declare_winner', match_id=match.id, winner_id=match.team2_id) }}" method="POST" class="timeline-team-form">
+                        <button type="submit" class="timeline-team timeline-team-button">{{ match.team2.name }}</button>
+                    </form>
+                {% endif %}
+            {% else %}
+                <span class="timeline-team timeline-team-tbd">TBD</span>
+            {% endif %}
+
+        </div>
+        {% endfor %}
+        </div>
+    </div>
 </div>
 {% endfor %}
 </div>
+{% endif %}
+
+<script>
+  const teamCountSelect = document.getElementById('team_count');
+  const teamInputs = document.querySelectorAll('.team-input');
+
+  function updateVisibleTeamFields() {
+    const count = parseInt(teamCountSelect.value, 10);
+    teamInputs.forEach(function (field) {
+      const index = parseInt(field.dataset.teamIndex, 10);
+      const input = field.querySelector('input');
+      if (index <= count) {
+        field.style.display = '';
+        input.required = true;
+      } else {
+        field.style.display = 'none';
+        input.required = false;
+        input.value = '';
+      }
+    });
+  }
+
+  teamCountSelect.addEventListener('change', updateVisibleTeamFields);
+  updateVisibleTeamFields();
+</script>
 
 {% endblock %}
