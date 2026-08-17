@@ -4,53 +4,62 @@
 <h1>Bracket Generator</h1>
 <p>Here is where you generate your brackets!</p>
 
-    <form action="/setup" method="POST">
-        {% for i in range(1, 9) %}
-        <div>
-            <label for="team{{ i }}">Team {{ i }}:</label>
-            <input type="text" id="team{{ i }}" name="team{{ i }}" placeholder="Enter team name" required>
-        </div>
-        {% endfor %}
+<form action="/setup" method="POST">
+    {% for i in range(1, 9) %}
+    <div>
+        <label for="team{{ i }}">Team {{ i }}:</label>
+        <input type="text" id="team{{ i }}" name="team{{ i }}" placeholder="Enter team name" required>
+    </div>
+    {% endfor %}
 
-        <button type="submit">Generate Bracket</button>
-        <div class="back-link">
-            <a href="{{ url_for('index') }}">Back to Home</a>
-        </div>
-    </form>
+    <button type="submit">Generate Bracket</button>
+    <div class="back-link">
+        <a href="{{ url_for('index') }}">Back to Home</a>
+    </div>
+</form>
 
-{% for round_num in [1, 2, 3, 4] %}
+{% for round_num in [1, 2, 3] %}
 <div class="round">
     <h2>
-        {% if round_num  == 1 %} Round of 16
-        {% elif round_num == 2 %} Quarterfinals
-        {% elif round_num == 3 %} Semifinals
-        {% elif round_num == 4 %} Final
+        {% if round_num == 1 %} Quarterfinals
+        {% elif round_num == 2 %} Semifinals
+        {% elif round_num == 3 %} Final
         {% endif %}
     </h2>
     {% for match in matches if match.round == round_num %}
     <div class="match">
 
-        <div class="team {% if match.winner_id == match.team1_id %}winner{% endif %}">
-            {% if match.team1_id %}
-                {{ match.team1.name }}
+        {% if match.team1_id %}
+            {% if match.winner_id %}
+                <div class="team {% if match.winner_id == match.team1_id %}winner{% endif %}">
+                    {{ match.team1.name }}
+                </div>
             {% else %}
-                TBD
+                <form action="{{ url_for('declare_winner', match_id=match.id, winner_id=match.team1_id) }}" method="POST" class="team-form">
+                    <button type="submit" class="team team-button">{{ match.team1.name }}</button>
+                </form>
             {% endif %}
-        </div>
+        {% else %}
+            <div class="team">TBD</div>
+        {% endif %}
 
-        <div class="team {% if match.winner_id == match.team2_id%}winner{% endif %}">
-            {% if match.team2_id %}
-                {{ match.team2.name }}
+        {% if match.team2_id %}
+            {% if match.winner_id %}
+                <div class="team {% if match.winner_id == match.team2_id %}winner{% endif %}">
+                    {{ match.team2.name }}
+                </div>
             {% else %}
-                TBD
+                <form action="{{ url_for('declare_winner', match_id=match.id, winner_id=match.team2_id) }}" method="POST" class="team-form">
+                    <button type="submit" class="team team-button">{{ match.team2.name }}</button>
+                </form>
             {% endif %}
-        </div>
+        {% else %}
+            <div class="team">TBD</div>
+        {% endif %}
 
     </div>
-    {% endfor%}
+    {% endfor %}
 </div>
 {% endfor %}
 
-
-</div>
 {% endblock %}
