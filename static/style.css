@@ -495,3 +495,160 @@ p {
 .tooltip .tooltip-arrow::before {
   border-top-color: var(--card);
 }
+
+/* BRACKET SETUP FORM */
+.setup-form {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  max-width: 500px;
+}
+
+.setup-field {
+  margin-bottom: 12px;
+}
+
+.setup-field label {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 4px;
+}
+
+.setup-field input {
+  width: 100%;
+  padding: 8px 10px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+.setup-field input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.setup-submit {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.setup-submit:hover {
+  opacity: 0.9;
+}
+
+.back-link {
+  margin-top: 12px;
+}
+
+.back-link a {
+  color: var(--muted);
+  font-size: 13px;
+  text-decoration: underline;
+}
+
+/* CHAMPION BANNER */
+.champion-banner {
+  background-color: var(--accent-dim);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.champion-label {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+
+.champion-name {
+  display: block;
+  color: var(--accent);
+  font-family: var(--font-head);
+  font-size: 28px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+/* BRACKET LAYOUT - rounds sit side by side as columns */
+.bracket-wrapper {
+  display: flex;
+  gap: 2rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+}
+
+.round {
+  flex: 0 0 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.round h2 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+/* MATCH + TEAM CARDS */
+.match {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.team {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.team-tbd {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.team-form {
+  margin: 0;
+}
+
+.team-button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.team-button:hover {
+  border-color: var(--accent);
+  background-color: var(--accent-dim);
+}
+
+.team.winner {
+  border-color: var(--green);
+  background-color: rgba(123, 168, 143, 0.15);
+  font-weight: 700;
+}

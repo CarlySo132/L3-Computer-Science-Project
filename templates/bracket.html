@@ -4,20 +4,29 @@
 <h1>Bracket Generator</h1>
 <p>Here is where you generate your brackets!</p>
 
-<form action="/setup" method="POST">
+<form action="/setup" method="POST" class="setup-form">
     {% for i in range(1, 9) %}
-    <div>
+    <div class="setup-field">
         <label for="team{{ i }}">Team {{ i }}:</label>
         <input type="text" id="team{{ i }}" name="team{{ i }}" placeholder="Enter team name" required>
     </div>
     {% endfor %}
 
-    <button type="submit">Generate Bracket</button>
+    <button type="submit" class="setup-submit">Generate Bracket</button>
     <div class="back-link">
         <a href="{{ url_for('index') }}">Back to Home</a>
     </div>
 </form>
 
+{% set final_match = matches | selectattr('round', 'equalto', 3) | first %}
+{% if final_match and final_match.winner_id %}
+<div class="champion-banner">
+    <span class="champion-label">Champion</span>
+    <span class="champion-name">{{ final_match.winner.name }}</span>
+</div>
+{% endif %}
+
+<div class="bracket-wrapper">
 {% for round_num in [1, 2, 3] %}
 <div class="round">
     <h2>
@@ -40,7 +49,7 @@
                 </form>
             {% endif %}
         {% else %}
-            <div class="team">TBD</div>
+            <div class="team team-tbd">TBD</div>
         {% endif %}
 
         {% if match.team2_id %}
@@ -54,12 +63,13 @@
                 </form>
             {% endif %}
         {% else %}
-            <div class="team">TBD</div>
+            <div class="team team-tbd">TBD</div>
         {% endif %}
 
     </div>
     {% endfor %}
 </div>
 {% endfor %}
+</div>
 
 {% endblock %}
