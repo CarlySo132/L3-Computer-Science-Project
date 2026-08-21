@@ -1,4 +1,5 @@
 import math
+
 from flask import Flask, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
@@ -159,6 +160,10 @@ def badminton():
 @app.route("/football")
 def football():
     return render_template('football.html')
+
+@app.route("/join")
+def join():
+    return render_template('join.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

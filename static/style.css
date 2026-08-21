@@ -689,3 +689,135 @@ p {
   color: var(--green);
   font-weight: 700;
 }
+
+/* CSS FOR JOIN-CODE FORM */
+.join-cointainer  {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 2rem 1rem;
+}
+
+.join-card  {
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+}
+
+.join-card h1 {
+  font-size: 28px;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  border: none;
+  padding: 0;
+  display: block;
+}
+
+.join-subtitle  {
+  color: var(--muted);
+  margin-bottom: 2rem;
+  font-size: 14px;
+}
+
+.join-form  {
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  color: var(--text);
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 14px;
+}
+
+.code-input {
+  width: 100%;
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  transition: border-color 0.3s ease;
+}
+
+.code-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.btn-primary  {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  margin-bottom: 1rem;
+}
+
+.btn-primary:hover  {
+  opacity: 0.9;
+}
+
+.divider  {
+  text-align: center;
+  color: var(--muted);
+  margin: 1.5rem 0;
+  font-size: 14px;
+}
+
+.btn-secondary  {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover  {
+  background-color: var(--accent);
+  color: white;
+}
+
+.join-info  {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 1.5rem;
+}
+
+.join-info p  {
+  font-size: 13px;
+  margin: 0;
+  color: var(--muted);
+}
+
+.join-info strong{
+  color: var(--text);
+}
