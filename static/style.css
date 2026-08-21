@@ -691,22 +691,23 @@ p {
 }
 
 /* CSS FOR JOIN-CODE FORM */
-.join-cointainer  {
+.join-container  {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 60vh;
+  min-height: calc(100vh - 80px);
   padding: 2rem 1rem;
 }
 
 .join-card  {
-  align-items: center;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 2rem;
   max-width: 400px;
   width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  
 }
 
 .join-card h1 {
@@ -716,12 +717,15 @@ p {
   border: none;
   padding: 0;
   display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .join-subtitle  {
   color: var(--muted);
   margin-bottom: 2rem;
   font-size: 14px;
+  line-height: 1.5;
 }
 
 .join-form  {
@@ -737,7 +741,7 @@ p {
   color: var(--text);
   font-weight: 600;
   margin-bottom: 1rem;
-  font-size: 14px;
+  font-size: 18px;
 }
 
 .code-input {
@@ -749,7 +753,7 @@ p {
   color: var(--text);
   text-transform: uppercase;
   letter-spacing: 2px;
-  font-size: 20px;
+  font-size: 14px;
   font-weight: 600;
   text-align: center;
   transition: border-color 0.3s ease;
@@ -758,23 +762,28 @@ p {
 .code-input:focus {
   outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(217, 112, 112, 0.15);
 }
 
 .btn-primary  {
+  display: block;
   width: 100%;
   padding: 12px;
-  background: var(--accent);
-  color: white;
-  border: none;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
   border-radius: 6px;
   font-weight: 600;
+  text-align: center;
+  text-decoration: none;
   cursor: pointer;
-  transition: opacity 0.2s ease;
-  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+  font-size: 14px;
 }
 
 .btn-primary:hover  {
-  opacity: 0.9;
+  background-color: var(--accent);
+  color: white;
 }
 
 .divider  {
@@ -797,6 +806,7 @@ p {
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-size: 14px;
 }
 
 .btn-secondary:hover  {
@@ -805,7 +815,7 @@ p {
 }
 
 .join-info  {
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 1rem;
