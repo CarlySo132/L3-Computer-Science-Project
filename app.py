@@ -1,6 +1,8 @@
 import math
+import random
+import string
 
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -14,6 +16,7 @@ class Bracket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     seed = db.Column(db.Integer, nullable=False)
+    access_code = db.Column(db.String(6), nullable=True)
 
 class Match(db.Model):
     __tablename__ = 'matches'
@@ -38,6 +41,10 @@ def round_label(round_num, total_rounds, num_teams):
         return "Quarterfinals"
     participants = num_teams // (2 ** (round_num - 1))
     return f"Round of {participants}"
+
+def generate_access_code():
+    """Generate a random 6-chracter access code like ABC123"""
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
 @app.route("/")
 def index():
@@ -72,6 +79,8 @@ def bracket():
 
 @app.route("/setup", methods=["POST"])
 def setup():
+    access_code = generate_access_code()
+
     team_count = int(request.form.get("team_count", 8))
     if team_count not in ALLOWED_SIZES:
         team_count = 8
@@ -81,7 +90,7 @@ def setup():
 
     for i in range(1, team_count + 1):
         name = request.form.get(f"team{i}", f"Team {i}")
-        team = Bracket(name=name, seed=i)
+        team = Bracket(name=name, seed=i, access_code=access_code)
         db.session.add(team)
 
     db.session.commit()
@@ -113,7 +122,7 @@ def setup():
             db.session.add(match)
 
     db.session.commit()
-    return redirect(url_for('bracket'))
+    return redirect(url_for('bracket_created', code=access_code))
 
 @app.route("/declare_winner/<int:match_id>/<int:winner_id>", methods=["POST"])
 def declare_winner(match_id, winner_id):
@@ -161,9 +170,74 @@ def badminton():
 def football():
     return render_template('football.html')
 
-@app.route("/join")
-def join():
-    return render_template('join.html')
+@app.route("/bracket/join")
+def join_bracket():
+    return render_template('join_bracket.html')
+
+@app.route('/bracket/access', methods=['POST'])
+def access_bracket():
+    code = request.form.get('access_code', '').upper().strip()
+
+    if not code:
+        flash('Please enter a code', 'error')
+        return redirect(url_for('join_bracket'))
+
+    team = Bracket.query.filter_by(access_code=code).first()
+
+    if not team:
+        flash('Invalid code. Please try again.', 'error')
+        return redirect(url_for('join_bracket'))
+
+    return redirect(url_for('view_bracket_by_code', code=code))
+
+
+@app.route('/bracket/view/<code>')
+def view_bracket_by_code(code):
+    code = code.upper()
+
+    teams = Bracket.query.filter_by(access_code=code).all()
+
+    if not teams:
+        flash('Bracket not found', 'error')
+        return redirect(url_for('join_bracket'))
+
+    team_ids = [t.id for t in teams]
+    matches = Match.query.filter(
+        (Match.team1_id.in_(team_ids)) | (Match.team2_id.in_(team_ids))
+    ).all()
+
+    final_match = None
+    for match in matches :
+        if match.round == 3 and match.winner_id:
+            final_match = match
+            break
+
+    tournament_name = "Tournament"
+
+    round_dict = {}
+    for match in matches:
+        if match.round not in round_dict:
+            round_dict[match.round] = []
+        round_dict[match.round].append(match)
+
+    rounds = [
+        {'number': r, 'matches': round_dict[r]}
+        for r in sorted(round_dict.keys())
+    ]
+    return render_template('view_bracket.html',
+                           code=code,
+                           matches=matches,
+                           teams=teams,
+                           final_match=final_match,
+                           tournament_name=tournament_name,
+                           rounds=rounds)
+
+@app.route('/bracket/created/<code>')
+def bracket_created(code):
+    return render_template('bracket_created.html', code=code)
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

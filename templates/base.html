@@ -15,7 +15,7 @@
             <li><a href="{{ url_for( 'index' )}}"{% if request.endpoint == 'index' %} class="active"{% endif %}>Home</a></li>
             <li><a href="{{ url_for('bracket')}}"{% if request.endpoint == 'bracket' %} class="active"{% endif %}>Generator</a></li>
             <li><a href="{{ url_for('rules')}}"{% if request.endpoint == 'rules' %} class="active"{% endif %}>Rules</a></li>
-            <li><a href="{{ url_for('join')}}"{% if request.endpoint == 'join' %} class="active"{% endif %}>Join</a></li>
+            <li><a href="{{ url_for('join_bracket')}}"{% if request.endpoint == 'join_bracket' %} class="active"{% endif %}>Join</a></li>
         </ul>
         <div class="theme-button-wrapper" id="theme-toggle">
            <button class="theme-icon-btn" id="icon-btn" onclick="toggleExpand()">
