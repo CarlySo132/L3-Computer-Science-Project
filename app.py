@@ -52,29 +52,13 @@ def index():
 
 @app.route("/bracket")
 def bracket():
-    teams = Bracket.query.all()
-    matches = Match.query.order_by(Match.round, Match.match_index).all()
-
-    num_teams = len(teams)
-    total_rounds = int(math.log2(num_teams)) if num_teams >= 2 else 0
-
-    rounds = []
-    for r in range(1, total_rounds + 1):
-        rounds.append({
-            "number": r,
-            "label": round_label(r, total_rounds, num_teams),
-            "matches": [m for m in matches if m.round == r]
-        })
-
-    final_match = matches[-1] if matches and matches[-1].round == total_rounds else None
-
     return render_template(
         'bracket.html',
-        teams=teams,
-        rounds=rounds,
-        num_teams=num_teams,
+        teams=[],
+        rounds=[],
+        num_teams=0,
         allowed_sizes=ALLOWED_SIZES,
-        final_match=final_match
+        final_match=None
     )
 
 @app.route("/setup", methods=["POST"])
@@ -234,10 +218,42 @@ def view_bracket_by_code(code):
 
 @app.route('/bracket/created/<code>')
 def bracket_created(code):
-    return render_template('bracket_created.html', code=code)
+    code = code.upper()
 
+    teams = Bracket.query.filter_by(access_code=code).all()
 
+    if not teams:
+        flash('Bracket not found', 'error')
+        return redirect(url_for('join_bracket'))
 
+    team_ids = [t.id for t in teams]
+    matches = Match.query.filter(
+        (Match.team1_id.in_(team_ids)) | (Match.team2_id.in_(team_ids))
+    ).all()
+
+    num_teams = len(teams)
+    total_rounds = int(math.log2(num_teams)) if num_teams >= 2 else 0
+
+    rounds = []
+    for r in range(1, total_rounds + 1):
+        rounds.append({
+            "number": r,
+            "label": round_label(r, total_rounds, num_teams),
+            "matches": [m for m in matches if m.round == r]
+        })
+
+    final_match = next((m for m in matches if m.round == total_rounds and m.winner_id), None)
+
+    return render_template(
+        'bracket.html',
+        teams=teams,
+        rounds=rounds,
+        num_teams=num_teams,
+        allowed_sizes=ALLOWED_SIZES,
+        final_match=final_match, 
+        code=code,
+        is_creator=True
+        )
 
 if __name__ == "__main__":
     app.run(debug=True)
