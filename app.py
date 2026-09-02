@@ -108,19 +108,19 @@ def setup():
     db.session.commit()
     return redirect(url_for('bracket_created', code=access_code))
 
-@app.route("/declare_winner/<int:match_id>/<int:winner_id>", methods=["POST"])
-def declare_winner(match_id, winner_id):
+@app.route("/declare_winner/<int:match_id>/<int:winner_id>/<code>", methods=["POST"])
+def declare_winner(match_id, winner_id, code):
     match = Match.query.get_or_404(match_id)
 
     if winner_id not in (match.team1_id, match.team2_id):
-        return redirect(url_for('bracket'))
+        return redirect(url_for('bracket_created', code=code))
 
     match.winner_id = winner_id
     db.session.commit()
 
     advance_winner(match)
 
-    return redirect(url_for('bracket'))
+    return redirect(url_for('bracket_created', code=code))
 
 def advance_winner(match):
     """Pushes the winner of `match` into the correct slot of the next round."""
@@ -174,48 +174,6 @@ def access_bracket():
 
     return redirect(url_for('view_bracket_by_code', code=code))
 
-
-@app.route('/bracket/view/<code>')
-def view_bracket_by_code(code):
-    code = code.upper()
-
-    teams = Bracket.query.filter_by(access_code=code).all()
-
-    if not teams:
-        flash('Bracket not found', 'error')
-        return redirect(url_for('join_bracket'))
-
-    team_ids = [t.id for t in teams]
-    matches = Match.query.filter(
-        (Match.team1_id.in_(team_ids)) | (Match.team2_id.in_(team_ids))
-    ).all()
-
-    final_match = None
-    for match in matches :
-        if match.round == 3 and match.winner_id:
-            final_match = match
-            break
-
-    tournament_name = "Tournament"
-
-    round_dict = {}
-    for match in matches:
-        if match.round not in round_dict:
-            round_dict[match.round] = []
-        round_dict[match.round].append(match)
-
-    rounds = [
-        {'number': r, 'matches': round_dict[r]}
-        for r in sorted(round_dict.keys())
-    ]
-    return render_template('view_bracket.html',
-                           code=code,
-                           matches=matches,
-                           teams=teams,
-                           final_match=final_match,
-                           tournament_name=tournament_name,
-                           rounds=rounds)
-
 @app.route('/bracket/created/<code>')
 def bracket_created(code):
     code = code.upper()
@@ -254,6 +212,51 @@ def bracket_created(code):
         code=code,
         is_creator=True
         )
+
+@app.route('/bracket/view/<code>')
+def view_bracket_by_code(code):
+    code = code.upper()
+
+    teams = Bracket.query.filter_by(access_code=code).all()
+
+    if not teams:
+        flash('Bracket not found', 'error')
+        return redirect(url_for('join_bracket'))
+
+    team_ids = [t.id for t in teams]
+    matches = Match.query.filter(
+        (Match.team1_id.in_(team_ids)) | (Match.team2_id.in_(team_ids))
+    ).all()
+
+    final_match = None
+    for match in matches :
+        if match.round == 3 and match.winner_id:
+            final_match = match
+            break
+
+    tournament_name = "Tournament"
+
+    round_dict = {}
+    for match in matches:
+        if match.round not in round_dict:
+            round_dict[match.round] = []
+        round_dict[match.round].append(match)
+
+    rounds = [
+        {'number': r, 'matches': round_dict[r]}
+        for r in sorted(round_dict.keys())
+    ]
+    return render_template(
+        'view_bracket.html',
+        code=code,
+        matches=matches,
+        teams=teams,
+        final_match=final_match,
+        tournament_name=tournament_name,
+        rounds=rounds
+        )
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,6 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% if code %}
+<div class="code-badge">
+    <h2>Access Code: <strong>{{ code }}</strong></h2>
+    <button onclick="navigator.clipboard.writeText('{{ code }}')">Copy Code</button>
+    <div class="bracket-actions">
+        <a href="{{ url_for('bracket')}}" class="btn btn-secondary">Back to Brackets</a>
+    </div>
+</div>
+
+
+{% else %}
 <h1>Bracket Generator</h1>
 <p>Here is where you generate your brackets!</p>
 
@@ -26,12 +37,14 @@
         <a href="{{ url_for('index') }}">Back to Home</a>
     </div>
 </form>
+{% endif %}
 
 {% if final_match and final_match.winner_id %}
 <div class="champion-banner">
     <span class="champion-label">Champion</span>
     <span class="champion-name">{{ final_match.winner.name }}</span>
 </div>
+
 {% endif %}
 
 {% if rounds %}
@@ -52,7 +65,7 @@
                 {% if match.winner_id %}
                     <span class="timeline-team {% if match.winner_id == match.team1_id %}winner{% endif %}">{{ match.team1.name }}</span>
                 {% else %}
-                    <form action="{{ url_for('declare_winner', match_id=match.id, winner_id=match.team1_id) }}" method="POST" class="timeline-team-form">
+                    <form action="{{ url_for('declare_winner', match_id=match.id, winner_id=match.team1_id, code=code) }}" method="POST" class="timeline-team-form">
                         <button type="submit" class="timeline-team timeline-team-button">{{ match.team1.name }}</button>
                     </form>
                 {% endif %}
@@ -66,7 +79,7 @@
                 {% if match.winner_id %}
                     <span class="timeline-team {% if match.winner_id == match.team2_id %}winner{% endif %}">{{ match.team2.name }}</span>
                 {% else %}
-                    <form action="{{ url_for('declare_winner', match_id=match.id, winner_id=match.team2_id) }}" method="POST" class="timeline-team-form">
+                    <form action="{{ url_for('declare_winner', match_id=match.id, winner_id=match.team2_id, code=code) }}" method="POST" class="timeline-team-form">
                         <button type="submit" class="timeline-team timeline-team-button">{{ match.team2.name }}</button>
                     </form>
                 {% endif %}
