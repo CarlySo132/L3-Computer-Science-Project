@@ -1,4 +1,5 @@
 import math
+import random
 from flask import Flask, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
@@ -60,13 +61,18 @@ def bracket():
 
     final_match = matches[-1] if matches and matches[-1].round == total_rounds else None
 
+    # The draw can only be reshuffled before the tournament has started,
+    # i.e. before any match has a recorded winner.
+    tournament_started = any(m.winner_id for m in matches)
+
     return render_template(
         'bracket.html',
         teams=teams,
         rounds=rounds,
         num_teams=num_teams,
         allowed_sizes=ALLOWED_SIZES,
-        final_match=final_match
+        final_match=final_match,
+        tournament_started=tournament_started
     )
 
 @app.route("/setup", methods=["POST"])
@@ -110,6 +116,36 @@ def setup():
                 team2_id=None
             )
             db.session.add(match)
+
+    db.session.commit()
+    return redirect(url_for('bracket'))
+
+@app.route("/reshuffle", methods=["POST"])
+def reshuffle():
+    """Randomly re-draws round 1 matchups for an already-generated bracket.
+
+    Unlike the client-side shuffle on the setup form (which reorders names
+    before the bracket exists), this acts on the live database after
+    generation. It's blocked once any match has a winner, so an in-progress
+    tournament can't be scrambled by mistake.
+    """
+    matches = Match.query.order_by(Match.round, Match.match_index).all()
+
+    if not matches:
+        return redirect(url_for('bracket'))
+
+    if any(m.winner_id for m in matches):
+        # Tournament already underway — refuse to touch the draw.
+        return redirect(url_for('bracket'))
+
+    round1_matches = [m for m in matches if m.round == 1]
+    teams = Bracket.query.order_by(Bracket.seed).all()
+
+    random.shuffle(teams)
+
+    for i, match in enumerate(round1_matches):
+        match.team1_id = teams[i * 2].id
+        match.team2_id = teams[i * 2 + 1].id
 
     db.session.commit()
     return redirect(url_for('bracket'))

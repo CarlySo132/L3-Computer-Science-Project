@@ -15,7 +15,7 @@
     </div>
 
     <button type="button" class="setup-submit" id="shuffle-btn">
-        <i class="fa-solid fa-shuffle"></i> Shuffle Seeds
+        Shuffle Seeds
     </button>
 
     {% for i in range(1, 17) %}
@@ -36,6 +36,14 @@
     <span class="champion-label">Champion</span>
     <span class="champion-name">{{ final_match.winner.name }}</span>
 </div>
+{% endif %}
+
+{% if rounds and not tournament_started %}
+<form action="{{ url_for('reshuffle') }}" method="POST" class="reshuffle-form">
+    <button type="submit" class="setup-submit">Re-shuffle Draw</button>
+</form>
+{% elif rounds and tournament_started %}
+<p class="reshuffle-locked">Draw is locked — results have already been recorded.</p>
 {% endif %}
 
 {% if rounds %}
