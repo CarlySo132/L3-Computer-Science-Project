@@ -689,3 +689,57 @@ p {
   color: var(--green);
   font-weight: 700;
 }
+
+/* RESHUFFLE DRAW (server-side reshuffle, live tournament action) */
+.reshuffle-form {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.reshuffle-btn {
+  background-color: var(--green);
+  color: var(--bg);
+  border: none;
+  padding: 10px 24px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: opacity 0.3s ease, transform 0.15s ease;
+}
+
+.reshuffle-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.reshuffle-btn:active {
+  transform: translateY(0);
+}
+
+.reshuffle-locked {
+  text-align: center;
+  color: var(--muted);
+  font-style: italic;
+  margin: 1.5rem 0;
+}
+
+.redraw-btn {
+  background-color: transparent;
+  color: var(--red);
+  border: 2px solid var(--red);
+  padding: 8px 22px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.redraw-btn:hover {
+  background-color: var(--red);
+  color: white;
+}

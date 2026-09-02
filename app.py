@@ -122,11 +122,8 @@ def setup():
 
 @app.route("/reshuffle", methods=["POST"])
 def reshuffle():
-    """Randomly re-draws round 1 matchups for an already-generated bracket.
-
-    Unlike the client-side shuffle on the setup form (which reorders names
-    before the bracket exists), this acts on the live database after
-    generation. It's blocked once any match has a winner, so an in-progress
+    """Version A: randomly re-draws round 1 matchups for an already-generated
+    bracket. Blocked once any match has a winner, so an in-progress
     tournament can't be scrambled by mistake.
     """
     matches = Match.query.order_by(Match.round, Match.match_index).all()
@@ -146,6 +143,41 @@ def reshuffle():
     for i, match in enumerate(round1_matches):
         match.team1_id = teams[i * 2].id
         match.team2_id = teams[i * 2 + 1].id
+
+    db.session.commit()
+    return redirect(url_for('bracket'))
+
+@app.route("/redraw", methods=["POST"])
+def redraw():
+    """Version B: full tournament redraw. Unlike /reshuffle, this is allowed
+    at ANY stage, including mid-tournament — but it wipes every recorded
+    winner and resets every later round back to empty before generating a
+    brand new random draw. Requires an explicit confirm=yes field so it
+    can't be triggered accidentally.
+    """
+    if request.form.get("confirm") != "yes":
+        return redirect(url_for('bracket'))
+
+    teams = Bracket.query.order_by(Bracket.seed).all()
+    if not teams:
+        return redirect(url_for('bracket'))
+
+    matches = Match.query.order_by(Match.round, Match.match_index).all()
+
+    random.shuffle(teams)
+
+    round1_matches = [m for m in matches if m.round == 1]
+    later_matches = [m for m in matches if m.round > 1]
+
+    for i, match in enumerate(round1_matches):
+        match.team1_id = teams[i * 2].id
+        match.team2_id = teams[i * 2 + 1].id
+        match.winner_id = None
+
+    for match in later_matches:
+        match.team1_id = None
+        match.team2_id = None
+        match.winner_id = None
 
     db.session.commit()
     return redirect(url_for('bracket'))
