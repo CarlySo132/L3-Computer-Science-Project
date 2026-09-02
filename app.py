@@ -1,4 +1,5 @@
 import math
+import random
 from flask import Flask, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
@@ -61,7 +62,7 @@ def bracket():
     final_match = matches[-1] if matches and matches[-1].round == total_rounds else None
 
     # Teams currently sitting in an undecided match (no winner yet) —
-    # these are the only teams eligible to be shuffled or manually swapped.
+    # these are the only teams eligible to be manually swapped.
     pending_teams = []
     for m in matches:
         if m.winner_id is None:
@@ -70,6 +71,21 @@ def bracket():
             if m.team2_id:
                 pending_teams.append(m.team2)
 
+    # A round is only shuffle-eligible if EVERY match in it is fully filled
+    # (both teams known) AND none of them have been played yet. This is
+    # different from "pending" above — a round with even one recorded
+    # result is off-limits for shuffling.
+    reshuffle_round = None
+    for r in range(1, total_rounds + 1):
+        round_matches = [m for m in matches if m.round == r]
+        if not round_matches:
+            continue
+        fully_filled = all(m.team1_id and m.team2_id for m in round_matches)
+        untouched = all(m.winner_id is None for m in round_matches)
+        if fully_filled and untouched:
+            reshuffle_round = r
+            break
+
     return render_template(
         'bracket.html',
         teams=teams,
@@ -77,7 +93,8 @@ def bracket():
         num_teams=num_teams,
         allowed_sizes=ALLOWED_SIZES,
         final_match=final_match,
-        pending_teams=pending_teams
+        pending_teams=pending_teams,
+        reshuffle_round=reshuffle_round
     )
 
 @app.route("/setup", methods=["POST"])
@@ -121,6 +138,53 @@ def setup():
                 team2_id=None
             )
             db.session.add(match)
+
+    db.session.commit()
+    return redirect(url_for('bracket'))
+
+@app.route("/reshuffle", methods=["POST"])
+def reshuffle():
+    """Randomly re-draws one round's matchups — but ONLY a round that is
+    completely untouched: every match in it must have both teams already
+    known, and none of those matches can have a recorded winner yet.
+
+    This works at any point in the tournament (not just before it starts),
+    but it will never touch a round where even one match has already been
+    played, and it will never touch a round that isn't fully set up yet
+    (e.g. later rounds still waiting on earlier winners).
+    """
+    matches = Match.query.order_by(Match.round, Match.match_index).all()
+    if not matches:
+        return redirect(url_for('bracket'))
+
+    total_rounds = max(m.round for m in matches)
+
+    target_round = None
+    for r in range(1, total_rounds + 1):
+        round_matches = [m for m in matches if m.round == r]
+        if not round_matches:
+            continue
+        fully_filled = all(m.team1_id and m.team2_id for m in round_matches)
+        untouched = all(m.winner_id is None for m in round_matches)
+        if fully_filled and untouched:
+            target_round = r
+            break
+
+    if target_round is None:
+        # No round is currently eligible — nothing to do.
+        return redirect(url_for('bracket'))
+
+    round_matches = [m for m in matches if m.round == target_round]
+    team_ids = []
+    for m in round_matches:
+        team_ids.append(m.team1_id)
+        team_ids.append(m.team2_id)
+
+    random.shuffle(team_ids)
+
+    for i, m in enumerate(round_matches):
+        m.team1_id = team_ids[i * 2]
+        m.team2_id = team_ids[i * 2 + 1]
 
     db.session.commit()
     return redirect(url_for('bracket'))
