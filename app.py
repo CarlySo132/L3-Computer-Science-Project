@@ -1,5 +1,4 @@
 import math
-import random
 from flask import Flask, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
@@ -61,9 +60,15 @@ def bracket():
 
     final_match = matches[-1] if matches and matches[-1].round == total_rounds else None
 
-    # The draw can only be reshuffled before the tournament has started,
-    # i.e. before any match has a recorded winner.
-    tournament_started = any(m.winner_id for m in matches)
+    # Teams currently sitting in an undecided match (no winner yet) —
+    # these are the only teams eligible to be shuffled or manually swapped.
+    pending_teams = []
+    for m in matches:
+        if m.winner_id is None:
+            if m.team1_id:
+                pending_teams.append(m.team1)
+            if m.team2_id:
+                pending_teams.append(m.team2)
 
     return render_template(
         'bracket.html',
@@ -72,7 +77,7 @@ def bracket():
         num_teams=num_teams,
         allowed_sizes=ALLOWED_SIZES,
         final_match=final_match,
-        tournament_started=tournament_started
+        pending_teams=pending_teams
     )
 
 @app.route("/setup", methods=["POST"])
@@ -120,64 +125,41 @@ def setup():
     db.session.commit()
     return redirect(url_for('bracket'))
 
-@app.route("/reshuffle", methods=["POST"])
-def reshuffle():
-    """Version A: randomly re-draws round 1 matchups for an already-generated
-    bracket. Blocked once any match has a winner, so an in-progress
-    tournament can't be scrambled by mistake.
+@app.route("/swap_teams", methods=["POST"])
+def swap_teams():
+    """Manually swaps two teams so each faces the other's current opponent.
+
+    Both teams must currently be sitting in an undecided match (no winner
+    yet). Already-played matches are never affected.
     """
-    matches = Match.query.order_by(Match.round, Match.match_index).all()
-
-    if not matches:
+    try:
+        team_a_id = int(request.form.get("team_a"))
+        team_b_id = int(request.form.get("team_b"))
+    except (TypeError, ValueError):
         return redirect(url_for('bracket'))
 
-    if any(m.winner_id for m in matches):
-        # Tournament already underway — refuse to touch the draw.
+    if team_a_id == team_b_id:
         return redirect(url_for('bracket'))
 
-    round1_matches = [m for m in matches if m.round == 1]
-    teams = Bracket.query.order_by(Bracket.seed).all()
+    pending_matches = Match.query.filter(Match.winner_id.is_(None)).all()
 
-    random.shuffle(teams)
+    match_a = next((m for m in pending_matches if team_a_id in (m.team1_id, m.team2_id)), None)
+    match_b = next((m for m in pending_matches if team_b_id in (m.team1_id, m.team2_id)), None)
 
-    for i, match in enumerate(round1_matches):
-        match.team1_id = teams[i * 2].id
-        match.team2_id = teams[i * 2 + 1].id
-
-    db.session.commit()
-    return redirect(url_for('bracket'))
-
-@app.route("/redraw", methods=["POST"])
-def redraw():
-    """Version B: full tournament redraw. Unlike /reshuffle, this is allowed
-    at ANY stage, including mid-tournament — but it wipes every recorded
-    winner and resets every later round back to empty before generating a
-    brand new random draw. Requires an explicit confirm=yes field so it
-    can't be triggered accidentally.
-    """
-    if request.form.get("confirm") != "yes":
+    if not match_a or not match_b or match_a.id == match_b.id:
+        # One of the teams isn't currently waiting on a match, or
+        # they're already scheduled to play each other.
         return redirect(url_for('bracket'))
 
-    teams = Bracket.query.order_by(Bracket.seed).all()
-    if not teams:
-        return redirect(url_for('bracket'))
+    if match_a.team1_id == team_a_id:
+        match_a.team1_id = team_b_id
+    else:
+        match_a.team2_id = team_b_id
 
-    matches = Match.query.order_by(Match.round, Match.match_index).all()
-
-    random.shuffle(teams)
-
-    round1_matches = [m for m in matches if m.round == 1]
-    later_matches = [m for m in matches if m.round > 1]
-
-    for i, match in enumerate(round1_matches):
-        match.team1_id = teams[i * 2].id
-        match.team2_id = teams[i * 2 + 1].id
-        match.winner_id = None
-
-    for match in later_matches:
-        match.team1_id = None
-        match.team2_id = None
-        match.winner_id = None
+    if match_b.team1_id == team_b_id:
+        match_b.team1_id = team_a_id
+    else:
+        match_b.team2_id = team_a_id
 
     db.session.commit()
     return redirect(url_for('bracket'))

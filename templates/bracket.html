@@ -38,18 +38,21 @@
 </div>
 {% endif %}
 
-{% if rounds and not tournament_started %}
-<form action="{{ url_for('reshuffle') }}" method="POST" class="reshuffle-form">
-    <button type="submit" class="reshuffle-btn">Re-shuffle Draw</button>
-</form>
-{% elif rounds and tournament_started %}
-<p class="reshuffle-locked">Draw is locked — results have already been recorded.</p>
-{% endif %}
-
-{% if rounds %}
-<form action="{{ url_for('redraw') }}" method="POST" class="reshuffle-form redraw-form" id="redraw-form">
-    <input type="hidden" name="confirm" value="yes">
-    <button type="submit" class="redraw-btn">Redraw Entire Tournament</button>
+{% if pending_teams %}
+<form action="{{ url_for('swap_teams') }}" method="POST" class="swap-form">
+    <label for="team_a">Swap</label>
+    <select id="team_a" name="team_a" required>
+        {% for team in pending_teams %}
+        <option value="{{ team.id }}">{{ team.name }}</option>
+        {% endfor %}
+    </select>
+    <label for="team_b">with</label>
+    <select id="team_b" name="team_b" required>
+        {% for team in pending_teams %}
+        <option value="{{ team.id }}">{{ team.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="swap-btn">Swap Opponents</button>
 </form>
 {% endif %}
 
@@ -151,16 +154,6 @@
   teamCountSelect.addEventListener('change', updateVisibleTeamFields);
   shuffleBtn.addEventListener('click', shuffleVisibleTeams);
   updateVisibleTeamFields();
-
-  const redrawForm = document.getElementById('redraw-form');
-  if (redrawForm) {
-    redrawForm.addEventListener('submit', function (e) {
-      const ok = confirm('This will erase all recorded results and redraw the whole tournament from scratch. Continue?');
-      if (!ok) {
-        e.preventDefault();
-      }
-    });
-  }
 </script>
 
 {% endblock %}
