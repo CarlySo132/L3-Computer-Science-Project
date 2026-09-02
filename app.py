@@ -139,7 +139,7 @@ def advance_winner(match):
     ).first()
 
     if next_match is None:
-        return  # match.round was the final, nothing further to advance to
+        return  
 
     if match.match_index % 2 == 0:
         next_match.team1_id = match.winner_id
