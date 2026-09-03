@@ -942,11 +942,11 @@ p {
 .matchup {
   display: flex;
   flex-direction: column;
-  background: var(--card);
+  background-color: var(--card);
   border: 1px solid var(--border);
   border-radius: 6px;
-  overflow: hidden;
-  min-width: 160px;
+  min-width: 200px;
+  position: relative;
 }
 
 .team {
@@ -961,8 +961,12 @@ p {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+.team:first-child {
+  border-radius: 6px 6px 0 0;
+}
 .team:last-child {
-  border-bottom: none;
+  border-radius: 0 0 6px 6px;
+  overflow: hidden;
 }
 
 .team:hover {
@@ -1001,11 +1005,36 @@ p {
   justify-content: center;
   min-width: 200px;
   height: 100%;
+  gap: 20px;
 
 }
 
 .bracket-round.final-round {
   justify-content: center;
+}
+
+.bracket-round:not(.final-round) .matchup::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -30px;
+  width: 30px;
+  height: 2px;
+  background-color: var(--border);
+}
+
+.bracket-round:not(.final-round) {
+  position: relative;
+}
+
+.bracket-round:not(.final-round):after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -30px;
+  width: 30px;
+  height: 2px;
+  background-color: var(--border);
 }
 
 .bracket-actions {
@@ -1028,4 +1057,45 @@ p {
 
 .btn-secondary:hover {
   background-color: rgba(217, 112, 112, 0.15);
+}
+
+/* Tournament preview list */
+.tournament-preview {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.round-match {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.match-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.match-vs {
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.tournament-champion-tag{
+  color: var(--green);
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
 }
