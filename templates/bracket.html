@@ -35,13 +35,53 @@
     </div>
 </form>
 {% endif %}
-
 {% if final_match and final_match.winner_id %}
 <div class="champion-banner">
     <span class="champion-label">Champion</span>
     <span class="champion-name">{{ final_match.winner.name }}</span>
 </div>
 
+{% endif %}
+
+
+{% if tournaments %}
+<h2>Your Tournaments</h2>
+<div class="accordion accordion-v2" id="tournamentAccordion">
+    {% for t in tournaments %}
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-num="{{ '%02d' % loop.index }}" data-bs-toggle="collapse" data-bs-target="#tournament-{{ t.code }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}"  aria-controls="tournament-{{ t.code }}">
+                {{ t.code }}&nbsp;&mdash;&nbsp;{{ t.num_teams }} teams
+                {% if t.is_complete %}
+                <span class="tournament-status complete">Complete</span>
+                    &nbsp;<span class="tournament-champion-tag">(Champion: {{ t.final_match.winner.name }})</span>
+                {% endif %}
+            </button>
+        </h2> 
+        <div id="tournament-{{ t.code }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#tournamentAccordion">
+            <div class="accordion-body">
+                <div class="tournament-preview">
+                    {% for round in t.rounds %}
+                    <div class="round-preview">
+                        <h4>{{ round.label }}</h4>
+                        <div class="round-matches">
+                            {% for match in round.matches %}
+                            <div class="match-preview">
+                                <span class="match-team">{{ match.team1.name if match.team1_id else 'TBD' }}</span>
+                                <span class="match-vs">vs</span>
+                                <span class="match-team">{{ match.team2.name if match.team2_id else 'TBD' }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <a href="{{ url_for('bracket_created', code=t.code) }}" class="btn-secondary">View Bracket</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% endif %}
 
 {% if pending_teams or reshuffle_round %}

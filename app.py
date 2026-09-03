@@ -47,6 +47,50 @@ def generate_access_code():
     """Generate a random 6-character access code like ABC123"""
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
+def get_all_tournaments():
+    all_teams = Bracket.query.order_by(Bracket.access_code, Bracket.seed).all()
+
+    codes_in_order = []
+    teams_by_code = {}
+    for teams in all_teams:
+        if teams.access_code not in codes_in_order:
+            codes_in_order.append(teams.access_code)
+            teams_by_code[teams.access_code] = []
+        teams_by_code[teams.access_code].append(teams)
+
+    tournaments = []
+    for code in codes_in_order:
+        teams = teams_by_code[code]
+        team_ids = [t.id for t in teams]
+        matches = Match.query.filter(
+            (Match.team1_id.in_(team_ids)) | (Match.team2_id.in_(team_ids))
+        ).order_by(Match.round, Match.match_index).all()
+
+        num_teams = len(teams)
+        total_rounds = int(math.log2(num_teams)) if num_teams >= 2 else 0
+
+        rounds = []
+        for r in range(1, total_rounds + 1):
+            rounds.append({
+                "number": r,
+                "label": round_label(r, total_rounds, num_teams),
+                "matches": [m for m in matches if m.round == r]
+            })
+
+        final_match = next((m for m in matches if m.round == total_rounds and m.winner_id), None)   
+
+        tournaments.append({
+            "code": code,
+            "num_teams": num_teams,
+            "teams": teams,
+            "rounds": rounds,
+            "final_match": final_match,
+            "is_complete": final_match is not None
+        })
+
+    tournaments.reverse()
+    return tournaments
+
 def get_bracket_context(code):
     """Fetch a code's teams/matches and compute shared derived data
     (rounds, pending teams, shuffle-eligible round) used by both the
@@ -127,8 +171,9 @@ def bracket():
         final_match=None,
         pending_teams=[],
         reshuffle_round=None,
-        code=None,
-        is_creator=False
+        code = None,
+        is_creator=False,
+        tournaments=get_all_tournaments()
     )
 
 @app.route("/setup", methods=["POST"])
@@ -138,9 +183,6 @@ def setup():
     team_count = int(request.form.get("team_count", 8))
     if team_count not in ALLOWED_SIZES:
         team_count = 8
-
-    Match.query.delete()
-    Bracket.query.delete()
 
     for i in range(1, team_count + 1):
         name = request.form.get(f"team{i}", f"Team {i}")
@@ -341,8 +383,9 @@ def bracket_created(code):
         pending_teams=ctx["pending_teams"],
         reshuffle_round=ctx["reshuffle_round"],
         code=ctx["code"],
-        is_creator=True
-        )
+        is_creator=True,
+        tournaments=get_all_tournaments()
+    )
 
 @app.route('/bracket/view/<code>')
 def view_bracket_by_code(code):
@@ -363,8 +406,6 @@ def view_bracket_by_code(code):
         tournament_name=tournament_name,
         rounds=ctx["rounds"]
         )
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)
