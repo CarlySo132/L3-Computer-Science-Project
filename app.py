@@ -1,6 +1,9 @@
 import math
 import random
-from flask import Flask, redirect, render_template, request, url_for
+import string
+
+from flask import Flask, flash, redirect, render_template, request, url_for
+
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -14,6 +17,7 @@ class Bracket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     seed = db.Column(db.Integer, nullable=False)
+    access_code = db.Column(db.String(6), nullable=True)
 
 class Match(db.Model):
     __tablename__ = 'matches'
@@ -39,14 +43,25 @@ def round_label(round_num, total_rounds, num_teams):
     participants = num_teams // (2 ** (round_num - 1))
     return f"Round of {participants}"
 
-@app.route("/")
-def index():
-    return render_template('index.html')
+def generate_access_code():
+    """Generate a random 6-character access code like ABC123"""
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
-@app.route("/bracket")
-def bracket():
-    teams = Bracket.query.all()
-    matches = Match.query.order_by(Match.round, Match.match_index).all()
+def get_bracket_context(code):
+    """Fetch a code's teams/matches and compute shared derived data
+    (rounds, pending teams, shuffle-eligible round) used by both the
+    creator view and the spectator/join view.
+    """
+    code = code.upper()
+    teams = Bracket.query.filter_by(access_code=code).all()
+
+    if not teams:
+        return None
+
+    team_ids = [t.id for t in teams]
+    matches = Match.query.filter(
+        (Match.team1_id.in_(team_ids)) | (Match.team2_id.in_(team_ids))
+    ).order_by(Match.round, Match.match_index).all()
 
     num_teams = len(teams)
     total_rounds = int(math.log2(num_teams)) if num_teams >= 2 else 0
@@ -59,7 +74,7 @@ def bracket():
             "matches": [m for m in matches if m.round == r]
         })
 
-    final_match = matches[-1] if matches and matches[-1].round == total_rounds else None
+    final_match = next((m for m in matches if m.round == total_rounds and m.winner_id), None)
 
     # Teams currently sitting in an undecided match (no winner yet) —
     # these are the only teams eligible to be manually swapped.
@@ -72,9 +87,7 @@ def bracket():
                 pending_teams.append(m.team2)
 
     # A round is only shuffle-eligible if EVERY match in it is fully filled
-    # (both teams known) AND none of them have been played yet. This is
-    # different from "pending" above — a round with even one recorded
-    # result is off-limits for shuffling.
+    # (both teams known) AND none of them have been played yet.
     reshuffle_round = None
     for r in range(1, total_rounds + 1):
         round_matches = [m for m in matches if m.round == r]
@@ -86,19 +99,42 @@ def bracket():
             reshuffle_round = r
             break
 
+    return {
+        "code": code,
+        "teams": teams,
+        "matches": matches,
+        "num_teams": num_teams,
+        "total_rounds": total_rounds,
+        "rounds": rounds,
+        "final_match": final_match,
+        "pending_teams": pending_teams,
+        "reshuffle_round": reshuffle_round,
+    }
+
+@app.route("/")
+def index():
+    return render_template('index.html')
+
+@app.route("/bracket")
+def bracket():
+    # No code yet — this just shows the setup form to create a new bracket.
     return render_template(
         'bracket.html',
-        teams=teams,
-        rounds=rounds,
-        num_teams=num_teams,
+        teams=[],
+        rounds=[],
+        num_teams=0,
         allowed_sizes=ALLOWED_SIZES,
-        final_match=final_match,
-        pending_teams=pending_teams,
-        reshuffle_round=reshuffle_round
+        final_match=None,
+        pending_teams=[],
+        reshuffle_round=None,
+        code=None,
+        is_creator=False
     )
 
 @app.route("/setup", methods=["POST"])
 def setup():
+    access_code = generate_access_code()
+
     team_count = int(request.form.get("team_count", 8))
     if team_count not in ALLOWED_SIZES:
         team_count = 8
@@ -108,7 +144,7 @@ def setup():
 
     for i in range(1, team_count + 1):
         name = request.form.get(f"team{i}", f"Team {i}")
-        team = Bracket(name=name, seed=i)
+        team = Bracket(name=name, seed=i, access_code=access_code)
         db.session.add(team)
 
     db.session.commit()
@@ -140,41 +176,29 @@ def setup():
             db.session.add(match)
 
     db.session.commit()
-    return redirect(url_for('bracket'))
+    return redirect(url_for('bracket_created', code=access_code))
 
-@app.route("/reshuffle", methods=["POST"])
-def reshuffle():
-    """Randomly re-draws one round's matchups — but ONLY a round that is
-    completely untouched: every match in it must have both teams already
-    known, and none of those matches can have a recorded winner yet.
+@app.route("/reshuffle/<code>", methods=["POST"])
+def reshuffle(code):
+    """Randomly re-draws one round's matchups for the bracket identified by
+    `code` — but ONLY a round that is completely untouched: every match in
+    it must have both teams already known, and none of those matches can
+    have a recorded winner yet.
 
-    This works at any point in the tournament (not just before it starts),
-    but it will never touch a round where even one match has already been
-    played, and it will never touch a round that isn't fully set up yet
-    (e.g. later rounds still waiting on earlier winners).
+    Scoped to this bracket's teams only, so shuffling one group's
+    tournament never touches any other bracket's matches.
     """
-    matches = Match.query.order_by(Match.round, Match.match_index).all()
-    if not matches:
-        return redirect(url_for('bracket'))
+    ctx = get_bracket_context(code)
+    if ctx is None:
+        flash('Bracket not found', 'error')
+        return redirect(url_for('join_bracket'))
 
-    total_rounds = max(m.round for m in matches)
-
-    target_round = None
-    for r in range(1, total_rounds + 1):
-        round_matches = [m for m in matches if m.round == r]
-        if not round_matches:
-            continue
-        fully_filled = all(m.team1_id and m.team2_id for m in round_matches)
-        untouched = all(m.winner_id is None for m in round_matches)
-        if fully_filled and untouched:
-            target_round = r
-            break
-
+    target_round = ctx["reshuffle_round"]
     if target_round is None:
         # No round is currently eligible — nothing to do.
-        return redirect(url_for('bracket'))
+        return redirect(url_for('bracket_created', code=ctx["code"]))
 
-    round_matches = [m for m in matches if m.round == target_round]
+    round_matches = [m for m in ctx["matches"] if m.round == target_round]
     team_ids = []
     for m in round_matches:
         team_ids.append(m.team1_id)
@@ -187,33 +211,38 @@ def reshuffle():
         m.team2_id = team_ids[i * 2 + 1]
 
     db.session.commit()
-    return redirect(url_for('bracket'))
+    return redirect(url_for('bracket_created', code=ctx["code"]))
 
-@app.route("/swap_teams", methods=["POST"])
-def swap_teams():
-    """Manually swaps two teams so each faces the other's current opponent.
-
-    Both teams must currently be sitting in an undecided match (no winner
-    yet). Already-played matches are never affected.
+@app.route("/swap_teams/<code>", methods=["POST"])
+def swap_teams(code):
+    """Manually swaps two teams — within the bracket identified by `code` —
+    so each faces the other's current opponent. Both teams must currently
+    be sitting in an undecided match (no winner yet).
     """
+    ctx = get_bracket_context(code)
+    if ctx is None:
+        flash('Bracket not found', 'error')
+        return redirect(url_for('join_bracket'))
+
     try:
         team_a_id = int(request.form.get("team_a"))
         team_b_id = int(request.form.get("team_b"))
     except (TypeError, ValueError):
-        return redirect(url_for('bracket'))
+        return redirect(url_for('bracket_created', code=ctx["code"]))
 
     if team_a_id == team_b_id:
-        return redirect(url_for('bracket'))
+        return redirect(url_for('bracket_created', code=ctx["code"]))
 
-    pending_matches = Match.query.filter(Match.winner_id.is_(None)).all()
+    pending_matches = [m for m in ctx["matches"] if m.winner_id is None]
 
     match_a = next((m for m in pending_matches if team_a_id in (m.team1_id, m.team2_id)), None)
     match_b = next((m for m in pending_matches if team_b_id in (m.team1_id, m.team2_id)), None)
 
     if not match_a or not match_b or match_a.id == match_b.id:
         # One of the teams isn't currently waiting on a match, or
-        # they're already scheduled to play each other.
-        return redirect(url_for('bracket'))
+        # they're already scheduled to play each other, or they don't
+        # belong to this bracket at all.
+        return redirect(url_for('bracket_created', code=ctx["code"]))
 
     if match_a.team1_id == team_a_id:
         match_a.team1_id = team_b_id
@@ -226,21 +255,21 @@ def swap_teams():
         match_b.team2_id = team_a_id
 
     db.session.commit()
-    return redirect(url_for('bracket'))
+    return redirect(url_for('bracket_created', code=ctx["code"]))
 
-@app.route("/declare_winner/<int:match_id>/<int:winner_id>", methods=["POST"])
-def declare_winner(match_id, winner_id):
+@app.route("/declare_winner/<int:match_id>/<int:winner_id>/<code>", methods=["POST"])
+def declare_winner(match_id, winner_id, code):
     match = Match.query.get_or_404(match_id)
 
     if winner_id not in (match.team1_id, match.team2_id):
-        return redirect(url_for('bracket'))
+        return redirect(url_for('bracket_created', code=code))
 
     match.winner_id = winner_id
     db.session.commit()
 
     advance_winner(match)
 
-    return redirect(url_for('bracket'))
+    return redirect(url_for('bracket_created', code=code))
 
 def advance_winner(match):
     """Pushes the winner of `match` into the correct slot of the next round."""
@@ -273,6 +302,69 @@ def badminton():
 @app.route("/football")
 def football():
     return render_template('football.html')
+
+@app.route("/bracket/join")
+def join_bracket():
+    return render_template('join_bracket.html')
+
+@app.route('/bracket/access', methods=['POST'])
+def access_bracket():
+    code = request.form.get('access_code', '').upper().strip()
+
+    if not code:
+        flash('Please enter a code', 'error')
+        return redirect(url_for('join_bracket'))
+
+    team = Bracket.query.filter_by(access_code=code).first()
+
+    if not team:
+        flash('Invalid code. Please try again.', 'error')
+        return redirect(url_for('join_bracket'))
+
+    return redirect(url_for('view_bracket_by_code', code=code))
+
+@app.route('/bracket/created/<code>')
+def bracket_created(code):
+    ctx = get_bracket_context(code)
+
+    if ctx is None:
+        flash('Bracket not found', 'error')
+        return redirect(url_for('join_bracket'))
+
+    return render_template(
+        'bracket.html',
+        teams=ctx["teams"],
+        rounds=ctx["rounds"],
+        num_teams=ctx["num_teams"],
+        allowed_sizes=ALLOWED_SIZES,
+        final_match=ctx["final_match"],
+        pending_teams=ctx["pending_teams"],
+        reshuffle_round=ctx["reshuffle_round"],
+        code=ctx["code"],
+        is_creator=True
+        )
+
+@app.route('/bracket/view/<code>')
+def view_bracket_by_code(code):
+    ctx = get_bracket_context(code)
+
+    if ctx is None:
+        flash('Bracket not found', 'error')
+        return redirect(url_for('join_bracket'))
+
+    tournament_name = "Tournament"
+
+    return render_template(
+        'view_bracket.html',
+        code=ctx["code"],
+        matches=ctx["matches"],
+        teams=ctx["teams"],
+        final_match=ctx["final_match"],
+        tournament_name=tournament_name,
+        rounds=ctx["rounds"]
+        )
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

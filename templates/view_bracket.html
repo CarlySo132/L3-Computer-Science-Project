@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="code-badge">
+    <h2>Access Code: <strong>{{ code }}</strong></h2>
+    <p>{{ tournament_name }}</p>
+</div>
+
+{% if final_match and final_match.winner_id %}
+<div class="champion-banner">
+    <span class="champion-label">CHAMPION</span>
+    <span class="champion-name">{{ final_match.winner.name }}</span>
+</div>
+{% endif %}
+
+{% if rounds %}
+<div class="bracket-timeline">
+{% for round in rounds %}
+<div class="timeline-round">
+    <div class="timeline-marker">
+        <span class="timeline-dot"></span>
+        {% if not loop.last %}<span class="timeline-line"></span>{% endif %}
+    </div>
+    <div class="timeline-content">
+        <h3>{{ round.label }}</h3>
+        <div class="timeline-matches">
+
+        {% for match in round.matches %}
+        <div class="timeline-match">
+            {% if match.team1_id %}
+                <span class="timeline-team {% if match.winner_id == match.team1_id %}winner{% endif %}">
+                    {{ match.team1.name }}
+                </span>
+            {% else %}
+                <span class="timeline-team timeline-team-tbd">TBD</span>
+            {% endif %}
+
+            <span class="timeline-vs">vs</span>
+
+            {% if match.team2_id %}
+                <span class="timeline-team {% if match.winner_id == match.team2_id %}winner{% endif %}">
+                    {{ match.team2.name }}
+                </span>
+            {% else %}
+                <span class="timeline-team timeline-team-tbd">TBD</span>
+            {% endif %}
+
+        </div>
+        {% endfor %}
+        
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% endif %}
+
+<div class="bracket-actions">
+    <a href="{{ url_for('join_bracket') }}" class="btn btn-primary">Join Another Bracket</a>
+    <a href="{{ url_for('index')}}">Back to Home</a>
+</div>
+{% endblock %}
