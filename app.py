@@ -3,6 +3,7 @@ import random
 import string
 
 from flask import Flask, flash, redirect, render_template, request, url_for
+
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -43,7 +44,7 @@ def round_label(round_num, total_rounds, num_teams):
     return f"Round of {participants}"
 
 def generate_access_code():
-    """Generate a random 6-chracter access code like ABC123"""
+    """Generate a random 6-character access code like ABC123"""
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
 def get_all_tournaments():
@@ -84,11 +85,75 @@ def get_all_tournaments():
             "teams": teams,
             "rounds": rounds,
             "final_match": final_match,
-            "is_completed": final_match is not None
+            "is_complete": final_match is not None
         })
 
     tournaments.reverse()
     return tournaments
+
+def get_bracket_context(code):
+    """Fetch a code's teams/matches and compute shared derived data
+    (rounds, pending teams, shuffle-eligible round) used by both the
+    creator view and the spectator/join view.
+    """
+    code = code.upper()
+    teams = Bracket.query.filter_by(access_code=code).all()
+
+    if not teams:
+        return None
+
+    team_ids = [t.id for t in teams]
+    matches = Match.query.filter(
+        (Match.team1_id.in_(team_ids)) | (Match.team2_id.in_(team_ids))
+    ).order_by(Match.round, Match.match_index).all()
+
+    num_teams = len(teams)
+    total_rounds = int(math.log2(num_teams)) if num_teams >= 2 else 0
+
+    rounds = []
+    for r in range(1, total_rounds + 1):
+        rounds.append({
+            "number": r,
+            "label": round_label(r, total_rounds, num_teams),
+            "matches": [m for m in matches if m.round == r]
+        })
+
+    final_match = next((m for m in matches if m.round == total_rounds and m.winner_id), None)
+
+    # Teams currently sitting in an undecided match (no winner yet) —
+    # these are the only teams eligible to be manually swapped.
+    pending_teams = []
+    for m in matches:
+        if m.winner_id is None:
+            if m.team1_id:
+                pending_teams.append(m.team1)
+            if m.team2_id:
+                pending_teams.append(m.team2)
+
+    # A round is only shuffle-eligible if EVERY match in it is fully filled
+    # (both teams known) AND none of them have been played yet.
+    reshuffle_round = None
+    for r in range(1, total_rounds + 1):
+        round_matches = [m for m in matches if m.round == r]
+        if not round_matches:
+            continue
+        fully_filled = all(m.team1_id and m.team2_id for m in round_matches)
+        untouched = all(m.winner_id is None for m in round_matches)
+        if fully_filled and untouched:
+            reshuffle_round = r
+            break
+
+    return {
+        "code": code,
+        "teams": teams,
+        "matches": matches,
+        "num_teams": num_teams,
+        "total_rounds": total_rounds,
+        "rounds": rounds,
+        "final_match": final_match,
+        "pending_teams": pending_teams,
+        "reshuffle_round": reshuffle_round,
+    }
 
 @app.route("/")
 def index():
@@ -96,6 +161,7 @@ def index():
 
 @app.route("/bracket")
 def bracket():
+    # No code yet — this just shows the setup form to create a new bracket.
     return render_template(
         'bracket.html',
         teams=[],
@@ -103,6 +169,10 @@ def bracket():
         num_teams=0,
         allowed_sizes=ALLOWED_SIZES,
         final_match=None,
+        pending_teams=[],
+        reshuffle_round=None,
+        code = None,
+        is_creator=False,
         tournaments=get_all_tournaments()
     )
 
@@ -150,6 +220,85 @@ def setup():
     db.session.commit()
     return redirect(url_for('bracket_created', code=access_code))
 
+@app.route("/reshuffle/<code>", methods=["POST"])
+def reshuffle(code):
+    """Randomly re-draws one round's matchups for the bracket identified by
+    `code` — but ONLY a round that is completely untouched: every match in
+    it must have both teams already known, and none of those matches can
+    have a recorded winner yet.
+
+    Scoped to this bracket's teams only, so shuffling one group's
+    tournament never touches any other bracket's matches.
+    """
+    ctx = get_bracket_context(code)
+    if ctx is None:
+        flash('Bracket not found', 'error')
+        return redirect(url_for('join_bracket'))
+
+    target_round = ctx["reshuffle_round"]
+    if target_round is None:
+        # No round is currently eligible — nothing to do.
+        return redirect(url_for('bracket_created', code=ctx["code"]))
+
+    round_matches = [m for m in ctx["matches"] if m.round == target_round]
+    team_ids = []
+    for m in round_matches:
+        team_ids.append(m.team1_id)
+        team_ids.append(m.team2_id)
+
+    random.shuffle(team_ids)
+
+    for i, m in enumerate(round_matches):
+        m.team1_id = team_ids[i * 2]
+        m.team2_id = team_ids[i * 2 + 1]
+
+    db.session.commit()
+    return redirect(url_for('bracket_created', code=ctx["code"]))
+
+@app.route("/swap_teams/<code>", methods=["POST"])
+def swap_teams(code):
+    """Manually swaps two teams — within the bracket identified by `code` —
+    so each faces the other's current opponent. Both teams must currently
+    be sitting in an undecided match (no winner yet).
+    """
+    ctx = get_bracket_context(code)
+    if ctx is None:
+        flash('Bracket not found', 'error')
+        return redirect(url_for('join_bracket'))
+
+    try:
+        team_a_id = int(request.form.get("team_a"))
+        team_b_id = int(request.form.get("team_b"))
+    except (TypeError, ValueError):
+        return redirect(url_for('bracket_created', code=ctx["code"]))
+
+    if team_a_id == team_b_id:
+        return redirect(url_for('bracket_created', code=ctx["code"]))
+
+    pending_matches = [m for m in ctx["matches"] if m.winner_id is None]
+
+    match_a = next((m for m in pending_matches if team_a_id in (m.team1_id, m.team2_id)), None)
+    match_b = next((m for m in pending_matches if team_b_id in (m.team1_id, m.team2_id)), None)
+
+    if not match_a or not match_b or match_a.id == match_b.id:
+        # One of the teams isn't currently waiting on a match, or
+        # they're already scheduled to play each other, or they don't
+        # belong to this bracket at all.
+        return redirect(url_for('bracket_created', code=ctx["code"]))
+
+    if match_a.team1_id == team_a_id:
+        match_a.team1_id = team_b_id
+    else:
+        match_a.team2_id = team_b_id
+
+    if match_b.team1_id == team_b_id:
+        match_b.team1_id = team_a_id
+    else:
+        match_b.team2_id = team_a_id
+
+    db.session.commit()
+    return redirect(url_for('bracket_created', code=ctx["code"]))
+
 @app.route("/declare_winner/<int:match_id>/<int:winner_id>/<code>", methods=["POST"])
 def declare_winner(match_id, winner_id, code):
     match = Match.query.get_or_404(match_id)
@@ -175,7 +324,7 @@ def advance_winner(match):
     ).first()
 
     if next_match is None:
-        return  # match.round was the final, nothing further to advance to
+        return  
 
     if match.match_index % 2 == 0:
         next_match.team1_id = match.winner_id
@@ -218,88 +367,45 @@ def access_bracket():
 
 @app.route('/bracket/created/<code>')
 def bracket_created(code):
-    code = code.upper()
+    ctx = get_bracket_context(code)
 
-    teams = Bracket.query.filter_by(access_code=code).all()
-
-    if not teams:
+    if ctx is None:
         flash('Bracket not found', 'error')
         return redirect(url_for('join_bracket'))
-
-    team_ids = [t.id for t in teams]
-    matches = Match.query.filter(
-        (Match.team1_id.in_(team_ids)) | (Match.team2_id.in_(team_ids))
-    ).all()
-
-    num_teams = len(teams)
-    total_rounds = int(math.log2(num_teams)) if num_teams >= 2 else 0
-
-    rounds = []
-    for r in range(1, total_rounds + 1):
-        rounds.append({
-            "number": r,
-            "label": round_label(r, total_rounds, num_teams),
-            "matches": [m for m in matches if m.round == r]
-        })
-
-    final_match = next((m for m in matches if m.round == total_rounds and m.winner_id), None)
 
     return render_template(
         'bracket.html',
-        teams=teams,
-        rounds=rounds,
-        num_teams=num_teams,
+        teams=ctx["teams"],
+        rounds=ctx["rounds"],
+        num_teams=ctx["num_teams"],
         allowed_sizes=ALLOWED_SIZES,
-        final_match=final_match, 
-        code=code,
+        final_match=ctx["final_match"],
+        pending_teams=ctx["pending_teams"],
+        reshuffle_round=ctx["reshuffle_round"],
+        code=ctx["code"],
         is_creator=True,
         tournaments=get_all_tournaments()
-        )
+    )
 
 @app.route('/bracket/view/<code>')
 def view_bracket_by_code(code):
-    code = code.upper()
+    ctx = get_bracket_context(code)
 
-    teams = Bracket.query.filter_by(access_code=code).all()
-
-    if not teams:
+    if ctx is None:
         flash('Bracket not found', 'error')
         return redirect(url_for('join_bracket'))
 
-    team_ids = [t.id for t in teams]
-    matches = Match.query.filter(
-        (Match.team1_id.in_(team_ids)) | (Match.team2_id.in_(team_ids))
-    ).all()
-
-    final_match = None
-    for match in matches :
-        if match.round == 3 and match.winner_id:
-            final_match = match
-            break
-
     tournament_name = "Tournament"
 
-    round_dict = {}
-    for match in matches:
-        if match.round not in round_dict:
-            round_dict[match.round] = []
-        round_dict[match.round].append(match)
-
-    rounds = [
-        {'number': r, 'matches': round_dict[r]}
-        for r in sorted(round_dict.keys())
-    ]
     return render_template(
         'view_bracket.html',
-        code=code,
-        matches=matches,
-        teams=teams,
-        final_match=final_match,
+        code=ctx["code"],
+        matches=ctx["matches"],
+        teams=ctx["teams"],
+        final_match=ctx["final_match"],
         tournament_name=tournament_name,
-        rounds=rounds
+        rounds=ctx["rounds"]
         )
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)

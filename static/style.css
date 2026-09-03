@@ -329,16 +329,6 @@ p {
   margin-top: 10px;
 }
 
-/*
-.btn{
-  padding-left: 50px;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-*/
 .card-content .btn:hover{
   transform: scale(0.98);
   opacity: 0.9;
@@ -695,6 +685,139 @@ p {
 .timeline-team.winner {
   color: var(--green);
   font-weight: 700;
+}
+
+/* MOVE / SWAP TEAMS (mid-tournament matchup editor) */
+.bracket-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 1rem 0 2rem;
+}
+
+.reshuffle-form {
+  margin: 0;
+}
+
+.reshuffle-btn {
+  background-color: var(--green);
+  color: var(--bg);
+  border: none;
+  padding: 10px 22px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: opacity 0.3s ease, transform 0.15s ease;
+}
+
+.reshuffle-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.reshuffle-btn:active {
+  transform: translateY(0);
+}
+
+.swap-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin: 0;
+}
+
+.swap-form label {
+  color: var(--muted);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.swap-form select {
+  padding: 6px 10px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+.swap-btn {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.swap-btn:hover {
+  opacity: 0.9;
+}
+
+/* REUSABLE CONFIRM MODAL ("Are you sure?" popup) */
+.confirm-modal-content {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.confirm-modal-message {
+  color: var(--text);
+  font-size: 16px;
+  margin: 12px 0 4px;
+  text-align: center;
+}
+
+.confirm-modal-footer {
+  border-top: 1px solid var(--border);
+  justify-content: center;
+  gap: 10px;
+}
+
+.confirm-modal-cancel {
+  background-color: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 8px 20px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.confirm-modal-cancel:hover {
+  color: var(--text);
+  border-color: var(--muted);
+}
+
+.confirm-modal-confirm {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.confirm-modal-confirm:hover {
+  opacity: 0.9;
+  color: white;
 }
 
 /* CSS FOR JOIN-CODE FORM */

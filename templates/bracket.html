@@ -43,6 +43,7 @@
 
 {% endif %}
 
+
 {% if tournaments %}
 <h2>Your Tournaments</h2>
 <div class="accordion accordion-v2" id="tournamentAccordion">
@@ -80,6 +81,34 @@
         </div>
     </div>
     {% endfor %}
+</div>
+{% endif %}
+
+{% if pending_teams or reshuffle_round %}
+<div class="bracket-actions">
+    {% if reshuffle_round %}
+    <form action="{{ url_for('reshuffle', code=code) }}" method="POST" class="reshuffle-form" data-confirm="Shuffle the matchups for this round?">
+        <button type="submit" class="reshuffle-btn">Shuffle Round</button>
+    </form>
+    {% endif %}
+
+    {% if pending_teams %}
+    <form action="{{ url_for('swap_teams', code=code) }}" method="POST" class="swap-form" data-confirm="Are you sure you want to swap these two teams' opponents?">
+        <label for="team_a">Swap</label>
+        <select id="team_a" name="team_a" required>
+            {% for team in pending_teams %}
+            <option value="{{ team.id }}">{{ team.name }}</option>
+            {% endfor %}
+        </select>
+        <label for="team_b">with</label>
+        <select id="team_b" name="team_b" required>
+            {% for team in pending_teams %}
+            <option value="{{ team.id }}">{{ team.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="swap-btn">Swap Opponents</button>
+    </form>
+    {% endif %}
 </div>
 {% endif %}
 
