@@ -961,3 +961,194 @@ p {
 .join-info strong{
   color: var(--text);
 }
+
+/*view bracket css stuff?*/
+.code-badge {
+  background-color: var(--card);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.code-badge-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.code-badge-info h3 {
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.code-badge-code {
+  font-size: 24px;
+  color: var(--accent);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.code-badge-description {
+  font-size: 13px;
+  color: var(--text);
+  margin-top: 8px;
+}
+
+.code-badge button {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+}
+
+.code-badge button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.champion-banner {
+  background-color: rgba(217, 112, 112, 0.15);
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.champion-label {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.champion-name {
+  display: block;
+  color: var(--accent);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.bracket-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 20px;
+}
+
+.round-title {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+  letter-spacing: 0.05em;
+}
+
+.matchup {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  min-width: 160px;
+}
+
+.team {
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.team:last-child {
+  border-bottom: none;
+}
+
+.team:hover {
+  background-color: rgba(217, 112, 112, 0.1);
+}
+
+.team-name {
+  color: var(--text);
+  flex: 1;
+}
+
+.team-name.winner {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.team-seed {
+  color: var(--muted);
+  font-size: 12px;
+  margin-right: 8px;
+}
+
+.round-title {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+  letter-spacing: 0.05em;
+}
+
+.bracket-round {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 200px;
+  height: 100%;
+
+}
+
+.bracket-round.final-round {
+  justify-content: center;
+}
+
+.bracket-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.btn-secondary {
+  padding: 12px 24px;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(217, 112, 112, 0.15);
+}
