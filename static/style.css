@@ -1014,8 +1014,9 @@ p {
 }
 
 .code-badge button:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background-color: rgba(217, 112, 112, 0.8);
+  transition: background-color 0.3s ease;
+  transform: scale(0.98) 0.3s ease;
 }
 
 .champion-banner {
@@ -1060,6 +1061,33 @@ p {
   color: var(--accent);
   margin-bottom: 12px;
   letter-spacing: 0.05em;
+}
+
+.round-preview{
+  min-width: 170px;
+  flex-shrink: 0;
+}
+
+.match-preview {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text);
+  width: 170px;
+  height: 80px;
+  box-sizing: border-box;
+}
+
+.match-team{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .matchup {
@@ -1179,120 +1207,9 @@ p {
 }
 
 .btn-secondary:hover {
-  background-color: rgba(217, 112, 112, 0.15);
+  background-color: var(--accent);
 }
 
-<<<<<<< HEAD
-.confirm-inline-armed {
-  background-color: var(--red) !important;
-  color: white !important;
-  animation: confirm-inline-pulse 1s ease-in-out infinite;
-}
- 
-@keyframes confirm-inline-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
- 
-.confirm-hold-target {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-}
- 
-.confirm-hold-fill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 0%;
-  background-color: rgba(255, 255, 255, 0.35);
-  z-index: -1;
-  pointer-events: none;
-  transition: width 0.05s linear;
-}
- 
-.confirm-hold-active {
-  cursor: pointer;
-}
-
-/* CONFIRM COMPONENT — OPTION B: TYPE TO CONFIRM
-   When triggered, a small inline panel with a text input replaces the
-   button/link in place. Nothing proceeds until the required word is
-   typed exactly and "Go" is pressed. */
-.confirm-type-panel {
-  display: inline-flex;
-  flex-direction: column;
-  gap: 6px;
-  background-color: var(--bg);
-  border: 2px dashed var(--accent);
-  border-radius: var(--radius);
-  padding: 10px 14px;
-}
-
-.confirm-type-label {
-  color: var(--muted);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.confirm-type-label strong {
-  color: var(--accent);
-}
-
-.confirm-type-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.confirm-type-input {
-  padding: 6px 10px;
-  background-color: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text);
-  font-family: var(--font-body);
-  width: 140px;
-}
-
-.confirm-type-input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.confirm-type-go {
-  background-color: var(--green);
-  color: var(--bg);
-  border: none;
-  padding: 6px 14px;
-  border-radius: var(--radius);
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.confirm-type-go:disabled {
-  background-color: var(--border);
-  color: var(--muted);
-  cursor: not-allowed;
-}
-
-.confirm-type-cancel {
-  background-color: transparent;
-  color: var(--muted);
-  border: 1px solid var(--border);
-  padding: 6px 12px;
-  border-radius: var(--radius);
-  cursor: pointer;
-}
-
-.confirm-type-cancel:hover {
-  color: var(--text);
-  border-color: var(--muted);
-}
-
-=======
 /* Tournament preview list */
 .tournament-preview {
   display: flex;
@@ -1333,4 +1250,23 @@ p {
   text-transform: none;
   letter-spacing: 0;
 }
->>>>>>> 04bb0705ec6f249dc7183d786de969969e498591
+
+.preview-view-btn {
+  display: inline-block;
+  width: auto;
+  padding: 10px 20px;
+  margin-top: 12px;
+  background-color: transparent;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  color: var(--accent);
+}
+
+.preview-view-btn:hover {
+  background-color: var(--accent);
+  color: white;
+}
