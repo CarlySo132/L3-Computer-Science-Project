@@ -3,8 +3,8 @@ import random
 import string
 
 from flask import Flask, flash, redirect, render_template, request, url_for
-
 from flask_sqlalchemy import SQLAlchemy
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bracket.db'
@@ -22,6 +22,7 @@ class Bracket(db.Model):
 class Match(db.Model):
     __tablename__ = 'matches'
     id = db.Column(db.Integer, primary_key=True)
+    access_code = db.Column(db.String(6), nullable=False)
     round = db.Column(db.Integer, nullable=False)
     match_index = db.Column(db.Integer, nullable=False)
     team1_id = db.Column(db.Integer, db.ForeignKey('teams.id'), nullable=True)
@@ -61,10 +62,7 @@ def get_all_tournaments():
     tournaments = []
     for code in codes_in_order:
         teams = teams_by_code[code]
-        team_ids = [t.id for t in teams]
-        matches = Match.query.filter(
-            (Match.team1_id.in_(team_ids)) | (Match.team2_id.in_(team_ids))
-        ).order_by(Match.round, Match.match_index).all()
+        matches = Match.query.filter_by(access_code=code).order_by(Match.round, Match.match_index).all()
 
         num_teams = len(teams)
         total_rounds = int(math.log2(num_teams)) if num_teams >= 2 else 0
@@ -102,10 +100,7 @@ def get_bracket_context(code):
     if not teams:
         return None
 
-    team_ids = [t.id for t in teams]
-    matches = Match.query.filter(
-        (Match.team1_id.in_(team_ids)) | (Match.team2_id.in_(team_ids))
-    ).order_by(Match.round, Match.match_index).all()
+    matches = Match.query.filter_by(access_code=code).order_by(Match.round, Match.match_index).all()
 
     num_teams = len(teams)
     total_rounds = int(math.log2(num_teams)) if num_teams >= 2 else 0
@@ -191,13 +186,14 @@ def setup():
 
     db.session.commit()
 
-    teams = Bracket.query.order_by(Bracket.seed).all()
+    teams = Bracket.query.filter(Bracket.access_code == access_code).order_by(Bracket.seed).all()
     total_rounds = int(math.log2(team_count))
 
     # Round 1 matches are filled with the actual teams.
     first_round_matches = team_count // 2
     for i in range(first_round_matches):
         match = Match(
+            access_code=access_code,
             round=1,
             match_index=i,
             team1_id=teams[i * 2].id,
@@ -210,6 +206,7 @@ def setup():
         matches_in_round = team_count // (2 ** r)
         for i in range(matches_in_round):
             match = Match(
+                access_code=access_code,
                 round=r,
                 match_index=i,
                 team1_id=None,
@@ -319,6 +316,7 @@ def advance_winner(match):
     next_match_index = match.match_index // 2
 
     next_match = Match.query.filter_by(
+        access_code=match.access_code,
         round=next_round,
         match_index=next_match_index
     ).first()
@@ -352,11 +350,9 @@ def join_bracket():
 @app.route('/bracket/access', methods=['POST'])
 def access_bracket():
     code = request.form.get('access_code', '').upper().strip()
-
     if not code:
         flash('Please enter a code', 'error')
         return redirect(url_for('join_bracket'))
-
     team = Bracket.query.filter_by(access_code=code).first()
 
     if not team:
