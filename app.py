@@ -342,7 +342,7 @@ def badminton():
 def football():
     return render_template('football.html')
 
-@app.route("/bracket/join")
+@app.route("/join")
 def join_bracket():
     return render_template('join_bracket.html')
 
