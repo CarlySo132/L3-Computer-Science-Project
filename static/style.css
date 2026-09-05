@@ -69,6 +69,7 @@ main {
 nav {
   position: sticky;
   top: 0;
+  z-index: 1000;
   background-color: var(--bg);
   border-bottom: 2px solid var(--border);
   display: flex;
@@ -276,8 +277,11 @@ p {
   background-color: var(--card);
   border: 2px solid var(--border);
   border-radius: 20px;
-  overflow: hidden;
   margin: 20px;
+  /* NOTE: overflow:hidden was removed from here — it was clipping this
+     card's own hover box-shadow flush against its edge instead of
+     letting the glow spread outward. Clipping now lives on .card img
+     below instead, which is all it was actually needed for. */
 }
 
 .card:hover{
@@ -285,8 +289,7 @@ p {
   border-color: var(--accent);
   box-shadow: 0 8px 24px var(--accent-dim);
   transform: translateY(-4px);
-  transition: height 0.5s ease;
-  transition: transform 0.5s ease;
+  transition: box-shadow 0.5s ease, transform 0.5s ease;
 }
 
 .card img{
@@ -295,6 +298,8 @@ p {
   object-fit: cover;
   padding: 5px;
   border-radius: 20px;
+  display: block;
+  overflow: hidden;
 }
 
 .card-content{
@@ -556,34 +561,6 @@ p {
   color: var(--muted);
   font-size: 13px;
   text-decoration: underline;
-}
-
-/* CHAMPION BANNER */
-.champion-banner {
-  background-color: var(--accent-dim);
-  border: 2px solid var(--accent);
-  border-radius: var(--radius);
-  padding: 20px;
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.champion-label {
-  display: block;
-  color: var(--muted);
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 6px;
-}
-
-.champion-name {
-  display: block;
-  color: var(--accent);
-  font-family: var(--font-head);
-  font-size: 28px;
-  font-weight: 800;
-  text-transform: uppercase;
 }
 
 /* VERTICAL TIMELINE BRACKET */
@@ -923,27 +900,6 @@ p {
   font-size: 14px;
 }
 
-.btn-secondary  {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  background: transparent;
-  color: var(--accent);
-  border: 1px solid var(--accent);
-  border-radius: 6px;
-  font-weight: 600;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 14px;
-}
-
-.btn-secondary:hover  {
-  background-color: var(--accent);
-  color: white;
-}
-
 .join-info  {
   background: var(--bg);
   border: 1px solid var(--border);
@@ -1009,14 +965,17 @@ p {
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
   white-space: nowrap;
 }
 
 .code-badge button:hover {
+  /* FIXED: transform can't include a duration/easing inline like the old
+     "scale(0.98) 0.3s ease" — that made the whole declaration invalid and
+     browsers silently dropped it, so the hover shrink never showed. The
+     transition is now declared separately on the base rule above. */
   background-color: rgba(217, 112, 112, 0.8);
-  transition: background-color 0.3s ease;
-  transform: scale(0.98) 0.3s ease;
+  transform: scale(0.98);
 }
 
 .champion-banner {
@@ -1140,16 +1099,6 @@ p {
   margin-right: 8px;
 }
 
-.round-title {
-  text-align: center;
-  font-size: 18px;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 12px;
-  letter-spacing: 0.05em;
-}
-
 .bracket-round {
   display: flex;
   flex-direction: column;
@@ -1178,36 +1127,25 @@ p {
   position: relative;
 }
 
-.bracket-round:not(.final-round):after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: -30px;
-  width: 30px;
-  height: 2px;
-  background-color: var(--border);
-}
-
-.bracket-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.btn-secondary {
+.btn-secondary  {
+  display: inline-block;
+  width: auto;
   padding: 12px 24px;
   background: transparent;
   color: var(--accent);
   border: 1px solid var(--accent);
   border-radius: 6px;
   font-weight: 600;
-  cursor: pointer;
+  text-align: center;
   text-decoration: none;
+  cursor: pointer;
   transition: all 0.2s ease;
+  font-size: 14px;
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover  {
   background-color: var(--accent);
+  color: white;
 }
 
 /* Tournament preview list */
@@ -1223,18 +1161,6 @@ p {
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
-
-.match-preview {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  background-color: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 14px;
-  color: var(--text);
 }
 
 .match-vs {
@@ -1269,4 +1195,108 @@ p {
 .preview-view-btn:hover {
   background-color: var(--accent);
   color: white;
+}
+
+/* HOMEPAGE SCOREBOARD (tap to score, with a -1 and reset button) */
+.scoreboard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin: 2rem 0;
+}
+
+.scoreboard-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 24px 40px;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.15s ease, transform 0.1s ease;
+}
+
+.scoreboard-side:hover {
+  border-color: var(--accent);
+}
+
+.scoreboard-side:active {
+  transform: scale(0.97);
+}
+
+.scoreboard-name {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  text-align: center;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  width: 120px;
+  cursor: text;
+}
+
+.scoreboard-name:focus {
+  outline: none;
+  color: var(--text);
+}
+
+.scoreboard-number {
+  font-size: 64px;
+  font-weight: 800;
+  color: var(--accent);
+  font-family: var(--font-head);
+  line-height: 1;
+}
+
+.scoreboard-tap-hint {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.scoreboard-minus-btn {
+  background-color: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.scoreboard-minus-btn:hover {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.scoreboard-divider {
+  font-size: 32px;
+  color: var(--muted);
+  font-weight: 300;
+}
+
+.scoreboard-reset {
+  display: block;
+  margin: 0 auto 2rem;
+  background-color: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 8px 20px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.scoreboard-reset:hover {
+  color: var(--text);
+  border-color: var(--muted);
 }

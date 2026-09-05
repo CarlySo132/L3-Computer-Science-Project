@@ -4,45 +4,67 @@
 <h1>Welcome to the Tournament Generator!</h1>
 <p>Create and manage your tournaments with ease.</p>
 
-<div class="scoreboard-v2" id="scoreboard-v2">
-    <div class="scoreboard-v2-side">
-        <input type="text" class="scoreboard-v2-name" value="Team A" maxlength="20">
-        <input type="number" class="scoreboard-v2-input" id="scoreboard-v2-left" value="0" min="0" inputmode="numeric">
+<div class="scoreboard" id="scoreboard">
+    <div class="scoreboard-side" data-side="left">
+        <input type="text" class="scoreboard-name" id="scoreboard-name-left" value="Team A" maxlength="20">
+        <span class="scoreboard-number" id="scoreboard-score-left">0</span>
+        <button type="button" class="scoreboard-minus-btn" data-side="left">−1</button>
+        <span class="scoreboard-tap-hint">Tap card to score</span>
     </div>
 
     <span class="scoreboard-divider">—</span>
 
-    <div class="scoreboard-v2-side">
-        <input type="text" class="scoreboard-v2-name" value="Team B" maxlength="20">
-        <input type="number" class="scoreboard-v2-input" id="scoreboard-v2-right" value="0" min="0" inputmode="numeric">
+    <div class="scoreboard-side" data-side="right">
+        <input type="text" class="scoreboard-name" id="scoreboard-name-right" value="Team B" maxlength="20">
+        <span class="scoreboard-number" id="scoreboard-score-right">0</span>
+        <button type="button" class="scoreboard-minus-btn" data-side="right">−1</button>
+        <span class="scoreboard-tap-hint">Tap card to score</span>
     </div>
 </div>
 
-<button type="button" class="scoreboard-reset" id="scoreboard-v2-reset">Reset Score</button>
+<button type="button" class="scoreboard-reset" id="scoreboard-reset">Reset Score</button>
 
 <img src="{{ url_for('static', filename='depositphotos_19085613-stock-illustration-sport-and-exercise.jpg') }}" alt="Tournament Image">
 
 <script>
     (function () {
-        const v2Left = document.getElementById('scoreboard-v2-left');
-        const v2Right = document.getElementById('scoreboard-v2-right');
-        const v2ResetBtn = document.getElementById('scoreboard-v2-reset');
+        const sides = document.querySelectorAll('.scoreboard-side');
+        const leftScore = document.getElementById('scoreboard-score-left');
+        const rightScore = document.getElementById('scoreboard-score-right');
+        const minusButtons = document.querySelectorAll('.scoreboard-minus-btn');
+        const resetBtn = document.getElementById('scoreboard-reset');
 
-        function clampNonNegative(input) {
-            let val = parseInt(input.value, 10);
-            if (isNaN(val) || val < 0) val = 0;
-            input.value = val;
+        let scores = { left: 0, right: 0 };
+
+        function render() {
+            leftScore.textContent = scores.left;
+            rightScore.textContent = scores.right;
         }
 
-        [v2Left, v2Right].forEach(function (input) {
-            input.addEventListener('input', function () {
-                clampNonNegative(input);
+        function bump(side, delta) {
+            scores[side] = Math.max(0, scores[side] + delta);
+            render();
+        }
+
+        sides.forEach(function (el) {
+            el.addEventListener('click', function (e) {
+                // Don't score when editing the team name or pressing -1.
+                if (e.target.classList.contains('scoreboard-name')) return;
+                if (e.target.classList.contains('scoreboard-minus-btn')) return;
+                bump(el.dataset.side, 1);
             });
         });
 
-        v2ResetBtn.addEventListener('click', function () {
-            v2Left.value = 0;
-            v2Right.value = 0;
+        minusButtons.forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation(); // don't also trigger the card's +1 tap
+                bump(btn.dataset.side, -1);
+            });
+        });
+
+        resetBtn.addEventListener('click', function () {
+            scores = { left: 0, right: 0 };
+            render();
         });
     })();
 </script>
