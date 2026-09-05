@@ -76,6 +76,7 @@ nav {
   align-items: center;
   padding: 0 2rem;
   transition: background-color 0.3s ease, border-color 0.3s ease;
+  z-index: 1000;
 }
 
 nav ul.nav-links{
@@ -975,7 +976,7 @@ p {
 .code-badge-content {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 20px;
 }
 
@@ -1066,6 +1067,8 @@ p {
 .round-preview{
   min-width: 170px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .match-preview {
@@ -1103,7 +1106,7 @@ p {
 .team {
   padding: 12px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   border-bottom: 1px solid var(--border);
   font-size: 14px;
@@ -1164,28 +1167,8 @@ p {
   justify-content: center;
 }
 
-.bracket-round:not(.final-round) .matchup::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: -30px;
-  width: 30px;
-  height: 2px;
-  background-color: var(--border);
-}
-
 .bracket-round:not(.final-round) {
   position: relative;
-}
-
-.bracket-round:not(.final-round):after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: -30px;
-  width: 30px;
-  height: 2px;
-  background-color: var(--border);
 }
 
 .bracket-actions {
@@ -1217,12 +1200,15 @@ p {
   overflow-x: auto;
   padding-bottom: 8px;
   margin-bottom: 12px;
+  align-items: stretch;
 }
 
-.round-match {
+.round-matches {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1;
+  justify-content: space-evenly;
 }
 
 .match-preview {
