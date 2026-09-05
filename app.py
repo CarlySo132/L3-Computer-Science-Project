@@ -8,6 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bracket.db'
+app.secret_key = 'dev-secret-key-change-this-later'  # needed for session + flash
 db = SQLAlchemy(app)
 
 ALLOWED_SIZES = [4, 8, 16]
@@ -152,24 +153,7 @@ def get_bracket_context(code):
 
 @app.route("/")
 def index():
-    tournaments = get_all_tournaments()
-
-    active_count = sum(1 for t in tournaments if not t["is_complete"])
-    completed_count = sum(1 for t in tournaments if t["is_complete"])
-    total_teams = sum(t["num_teams"] for t in tournaments)
-
-    recent_champions = [
-        {"code": t["code"], "name": t["final_match"].winner.name}
-        for t in tournaments if t["is_complete"]
-    ][:5]
-
-    return render_template(
-        'index.html',
-        active_count=active_count,
-        completed_count=completed_count,
-        total_teams=total_teams,
-        recent_champions=recent_champions
-    )
+    return render_template('index.html')
 
 @app.route("/bracket")
 def bracket():
