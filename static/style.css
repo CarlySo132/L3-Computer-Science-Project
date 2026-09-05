@@ -569,20 +569,20 @@ p {
   margin-bottom: 2rem;
 }
 
-.champion-label {
+.champion-banner .champion-label {
   display: block;
-  color: var(--muted);
-  font-size: 13px;
+  color: var(--text);
+  font-size: 18px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 6px;
 }
 
-.champion-name {
+.champion-banner .champion-name {
   display: block;
   color: var(--accent);
   font-family: var(--font-head);
-  font-size: 28px;
+  font-size: 38px;
   font-weight: 800;
   text-transform: uppercase;
 }
