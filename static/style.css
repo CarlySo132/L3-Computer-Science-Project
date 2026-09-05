@@ -1069,6 +1069,8 @@ p {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  gap: 12px;
 }
 
 .match-preview {
@@ -1207,8 +1209,6 @@ p {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  flex: 1;
-  justify-content: space-evenly;
 }
 
 .match-preview {

@@ -48,7 +48,7 @@ def generate_access_code():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
 def get_all_tournaments():
-    all_teams = Bracket.query.order_by(Bracket.access_code, Bracket.seed).all()
+    all_teams = Bracket.query.order_by(Bracket.id).all()
 
     codes_in_order = []
     teams_by_code = {}
