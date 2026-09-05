@@ -3,5 +3,59 @@
 {% block content %}
 <h1>Welcome to the Tournament Generator!</h1>
 <p>Create and manage your tournaments with ease.</p>
-<img src="{{ url_for('static', filename='/Users/carlyso/Documents/GitHub/L3-Computer-Science-Project/static/depositphotos_19085613-stock-illustration-sport-and-exercise.jpg') }}" alt="Tournament Image">
+
+<div class="scoreboard" id="scoreboard">
+    <div class="scoreboard-side" id="scoreboard-left" data-side="left">
+        <input type="text" class="scoreboard-name" id="scoreboard-name-left" value="Team A" maxlength="20">
+        <span class="scoreboard-number" id="scoreboard-score-left">0</span>
+        <span class="scoreboard-tap-hint">Tap to score</span>
+    </div>
+
+    <span class="scoreboard-divider">—</span>
+
+    <div class="scoreboard-side" id="scoreboard-right" data-side="right">
+        <input type="text" class="scoreboard-name" id="scoreboard-name-right" value="Team B" maxlength="20">
+        <span class="scoreboard-number" id="scoreboard-score-right">0</span>
+        <span class="scoreboard-tap-hint">Tap to score</span>
+    </div>
+</div>
+
+<button type="button" class="scoreboard-reset" id="scoreboard-reset">Reset Score</button>
+
+<img src="{{ url_for('static', filename='depositphotos_19085613-stock-illustration-sport-and-exercise.jpg') }}" alt="Tournament Image">
+
+<script>
+    (function () {
+        const left = document.getElementById('scoreboard-left');
+        const right = document.getElementById('scoreboard-right');
+        const leftScore = document.getElementById('scoreboard-score-left');
+        const rightScore = document.getElementById('scoreboard-score-right');
+        const resetBtn = document.getElementById('scoreboard-reset');
+
+        let scores = { left: 0, right: 0 };
+
+        function render() {
+            leftScore.textContent = scores.left;
+            rightScore.textContent = scores.right;
+        }
+
+        function bump(side) {
+            scores[side] += 1;
+            render();
+        }
+
+        [left, right].forEach(function (el) {
+            el.addEventListener('click', function (e) {
+                // Don't score when the person is editing the team name.
+                if (e.target.classList.contains('scoreboard-name')) return;
+                bump(el.dataset.side);
+            });
+        });
+
+        resetBtn.addEventListener('click', function () {
+            scores = { left: 0, right: 0 };
+            render();
+        });
+    })();
+</script>
 {% endblock %}
