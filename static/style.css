@@ -1499,3 +1499,9 @@ p {
   border-color: var(--muted);
   transform: translateY(-2px);
 }
+
+.timer-adjust-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}

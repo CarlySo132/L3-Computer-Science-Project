@@ -101,7 +101,12 @@
 
         timerDisplay.classList.toggle('timer-done', clamped === 0);
 
-        
+        document.querySelectorAll('.timer-adjust-btn').forEach(btn => {
+        const label = btn.textContent.trim();
+        const isPlus = label.startsWith('+');
+        const isMinus = label.startsWith('-');
+        btn.disabled = (isPlus && clamped >= MAX_SECONDS) || (isMinus && clamped <= 0);
+        });
     }
 
     function tick() {
