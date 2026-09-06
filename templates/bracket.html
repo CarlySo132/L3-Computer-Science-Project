@@ -37,9 +37,6 @@
     {% endfor %}
 
     <button type="submit" class="setup-submit">Generate Bracket</button>
-    <div class="back-link">
-        <a href="{{ url_for('index') }}">Back to Home</a>
-    </div>
 </form>
 {% endif %}
 {% if final_match and final_match.winner_id %}
