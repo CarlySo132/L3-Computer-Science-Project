@@ -1,5 +1,6 @@
 import math
 import random
+import secrets
 import string
 
 from flask import Flask, flash, redirect, render_template, request, url_for
@@ -7,6 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bracket.db'
+app.secret_key = secrets.token_hex(16)
 db = SQLAlchemy(app)
 
 ALLOWED_SIZES = [4, 8, 16]
@@ -27,6 +29,7 @@ class Match(db.Model):
     team1_id = db.Column(db.Integer, db.ForeignKey('teams.id'), nullable=True)
     team2_id = db.Column(db.Integer, db.ForeignKey('teams.id'), nullable=True)
     winner_id = db.Column(db.Integer, db.ForeignKey('teams.id'), nullable=True)
+    previous_winner_id = db.Column(db.Integer, db.ForeignKey('teams.id'), nullable=True)
 
     team1 = db.relationship('Bracket', foreign_keys=[team1_id])
     team2 = db.relationship('Bracket', foreign_keys=[team2_id])
@@ -47,7 +50,7 @@ def generate_access_code():
     """Generate a random 6-character access code like ABC123"""
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
-def get_all_tournaments():
+def get_all_tournaments(newest_first=True):
     all_teams = Bracket.query.order_by(Bracket.id).all()
 
     codes_in_order = []
@@ -85,7 +88,8 @@ def get_all_tournaments():
             "is_complete": final_match is not None
         })
 
-    tournaments.reverse()
+    if newest_first:
+        tournaments.reverse()
     return tournaments
 
 def get_bracket_context(code):
@@ -156,6 +160,7 @@ def index():
 @app.route("/bracket")
 def bracket():
     # No code yet — this just shows the setup form to create a new bracket.
+    sort_order = request.args.get('sort', 'desc')
     return render_template(
         'bracket.html',
         teams=[],
@@ -167,7 +172,8 @@ def bracket():
         reshuffle_round=None,
         code = None,
         is_creator=False,
-        tournaments=get_all_tournaments()
+        tournaments=get_all_tournaments(newest_first=(sort_order == 'desc')),
+        sort_order=sort_order
     )
 
 @app.route("/setup", methods=["POST"])
@@ -247,6 +253,7 @@ def reshuffle(code):
     for i, m in enumerate(round_matches):
         m.team1_id = team_ids[i * 2]
         m.team2_id = team_ids[i * 2 + 1]
+        m.previous_winner_id = None
 
     db.session.commit()
     return redirect(url_for('bracket_created', code=ctx["code"]))
@@ -292,6 +299,9 @@ def swap_teams(code):
     else:
         match_b.team2_id = team_a_id
 
+    match_a.previous_winner_id = None
+    match_b.preivous_winner_id = None
+
     db.session.commit()
     return redirect(url_for('bracket_created', code=ctx["code"]))
 
@@ -299,10 +309,13 @@ def swap_teams(code):
 def declare_winner(match_id, winner_id, code):
     match = Match.query.get_or_404(match_id)
 
+    if match.access_code != code.upper():
+        return redirect(url_for('join_bracket'))
     if winner_id not in (match.team1_id, match.team2_id):
         return redirect(url_for('bracket_created', code=code))
 
     match.winner_id = winner_id
+    match.previous_winner_id = None
     db.session.commit()
 
     advance_winner(match)
@@ -329,6 +342,44 @@ def advance_winner(match):
         next_match.team2_id = match.winner_id
 
     db.session.commit()
+
+def remove_winner(match):
+    next_round = match.round +1
+    next_match_index = match.match_index // 2
+
+    next_match = Match.query.filter_by(
+        access_code=match.access_code,
+        round=next_round,
+        match_index=next_match_index
+    ).first()
+
+    if next_match is not None:
+        if next_match.winner_id is not None:
+            return False
+        if match.match_index % 2 == 0:
+            next_match.team1_id = None
+        else:
+            next_match.team2_id = None
+
+    match.winner_id = None 
+    db.session.commit()
+    return True
+
+@app.route("/undo_winner/<int:match_id>/<code>", methods=["POST"])
+def undo_winner(match_id, code):
+    match = Match.query.get_or_404(match_id)
+
+    if match.access_code != code.upper():
+        return redirect(url_for('join_bracket'))
+
+    if match.winner_id is None:
+        return redirect(url_for('bracket_created', code=code))
+
+    success = remove_winner(match)
+    if not success:
+        flash('Uno the later round result first before undoing this match.')
+
+    return redirect(url_for('bracket_created', code=code))
 
 @app.route("/rules")
 def rules():
@@ -368,6 +419,8 @@ def bracket_created(code):
         flash('Bracket not found', 'error')
         return redirect(url_for('join_bracket'))
 
+    sort_order = request.args.get('sort', 'desc')
+
     return render_template(
         'bracket.html',
         teams=ctx["teams"],
@@ -379,7 +432,8 @@ def bracket_created(code):
         reshuffle_round=ctx["reshuffle_round"],
         code=ctx["code"],
         is_creator=True,
-        tournaments=get_all_tournaments()
+        tournaments=get_all_tournaments(newest_first=(sort_order == 'desc')),
+        sort_order=sort_order
     )
 
 @app.route('/bracket/view/<code>')
@@ -402,8 +456,18 @@ def view_bracket_by_code(code):
         rounds=ctx["rounds"]
         )
 
-if __name__ == "__main__":
-    app.run(debug=True)
+@app.route("/bracket/delete/<code>", methods=["POST"])
+def delete_bracket(code):
+    code = code.upper()
+    Match.query.filter_by(access_code=code).delete()
+    Bracket.query.filter_by(access_code=code).delete()
+    db.session.commit()
+    flash(f'Tournament {code} deleted', 'success')
+    return redirect(url_for('bracket'))
 
 with app.app_context():
     db.create_all()
+
+if __name__ == "__main__":
+    app.run(debug=True)
+

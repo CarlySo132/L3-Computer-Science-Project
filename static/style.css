@@ -253,7 +253,7 @@ h4, h5, h6{
 }
 
 p {
-  color: var(--muted);
+  color: var(--text);
   margin-bottom: 1rem;
   font-weight: 300;
 }
@@ -690,11 +690,10 @@ p {
 /* MOVE / SWAP TEAMS (mid-tournament matchup editor) */
 .bracket-actions {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  margin: 1rem 0 2rem;
+  margin-top: 20px;
 }
 
 .reshuffle-form {
@@ -1194,6 +1193,23 @@ p {
   background-color: var(--accent);
 }
 
+.tournament-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.sort-toggle-btn{
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+}
+
 /* Tournament preview list */
 .tournament-preview {
   display: flex;
@@ -1253,5 +1269,65 @@ p {
 
 .preview-view-btn:hover {
   background-color: var(--accent);
+  color: white;
+}
+
+.delete-tournament-btn{
+  display: inline-block;
+  padding: 10px 20px;
+  background: transparent;
+  color: var(--red);
+  border: 1px solid var(--red);
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-tournament-btn:hover {
+  background-color: var(--red);
+  color: white;
+}
+
+/* Undo stuff */
+.undo-form {
+  display: inline-block;
+  margin-left: 6px;
+}
+
+.undo-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.undo-btn:hover{
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.redo-form{
+  margin-top: 6px;
+  width: 100%;
+}
+
+.redo-btn{
+  background: transparent;
+  border: 1px solid var(--green);
+  color: var(--green);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.redo-btn:hover{
+  background-color: var(--green);
   color: white;
 }

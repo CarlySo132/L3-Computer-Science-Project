@@ -75,6 +75,10 @@
         <button type="submit" class="swap-btn">Swap Opponents</button>
     </form>
     {% endif %}
+
+    <form action="{{ url_for('delete_bracket', code=code) }}" method="POST" data-confirm="Delete this tournament permanently? This can't be undone.">
+        <button type="submit" class="delete-tournament-btn">Delete Tournament</button>
+    </form>
 </div>
 {% endif %}
 
@@ -95,6 +99,11 @@
             {% if match.team1_id %}
                 {% if match.winner_id %}
                     <span class="timeline-team {% if match.winner_id == match.team1_id %}winner{% endif %}">{{ match.team1.name }}</span>
+                    {% if match.winner_id == match.team1_id %}
+                    <form action="{{ url_for('undo_winner', match_id=match.id, code=code) }}" method="POST" class="undo-form" data-confirm="Undo this result?">
+                        <button type="submit" class="undo-btn" title="Undo winner"><i class="fa-solid fa-arrow-rotate-left"></i></button>
+                    </form>
+                    {% endif %}
                 {% else %}
                     <form action="{{ url_for('declare_winner', match_id=match.id, winner_id=match.team1_id, code=code) }}" method="POST" class="timeline-team-form">
                         <button type="submit" class="timeline-team timeline-team-button">{{ match.team1.name }}</button>
@@ -109,6 +118,11 @@
             {% if match.team2_id %}
                 {% if match.winner_id %}
                     <span class="timeline-team {% if match.winner_id == match.team2_id %}winner{% endif %}">{{ match.team2.name }}</span>
+                    {% if match.winner_id == match.team2_id %}
+                    <form action="{{ url_for('undo_winner', match_id=match.id, code=code) }}" method="POST" class="undo-form" data-confirm="Undo this result?">
+                        <button type="submit" class="undo-btn" title="Undo winner"><i class="fa-solid fa-arrow-rotate-left"></i></button>
+                    </form>
+                    {% endif %}
                 {% else %}
                     <form action="{{ url_for('declare_winner', match_id=match.id, winner_id=match.team2_id, code=code) }}" method="POST" class="timeline-team-form">
                         <button type="submit" class="timeline-team timeline-team-button">{{ match.team2.name }}</button>
@@ -118,6 +132,11 @@
                 <span class="timeline-team timeline-team-tbd">TBD</span>
             {% endif %}
 
+            {% if not match.winner_id and match.previous_winenr_id %}
+            <form action="{{url_for('redo_winner', match_id=match.id, code=code) }}" method="POST" class="redo-form" data-confirm="Redo the Previous result for this match?">
+                <button type="submit" class="redo-btn" title="Redo"><i class="fa-solid fa-arrow-rotate-right"></i></button>
+            </form>
+            {% endif %}
         </div>
         {% endfor %}
         </div>
@@ -128,7 +147,16 @@
 {% endif %}
 
 {% if tournaments %}
-<h2>Your Tournaments</h2>
+<div class="tournament-header">
+    <h2>Your Tournaments</h2>
+    <a href="{{ url_for(request.endpoint, code=code, sort='asc' if sort_order == 'desc' else 'desc') }}" class="sort-toggle-btn">
+        {% if sort_order == 'desc' %}
+            <i class="fa-solid fa-arrow-down-wide-short"></i>
+        {% else %}
+            <i class="fa-solid fa-arrow-up-wide-short"></i>
+        {% endif %}
+    </a>
+</div>
 <div class="accordion accordion-v2" id="tournamentAccordion">
     {% for t in tournaments %}
     <div class="accordion-item">
