@@ -34,11 +34,9 @@
     {% endblock %}
     </div>
 
-    <!-- REUSABLE "ARE YOU SURE?" CONFIRM MODAL
-         Add data-confirm="Your message here" to ANY <form> or <a> anywhere
-         on the site and it will automatically show this popup first,
-         only proceeding if the user clicks Confirm. No extra JS needed
-         per page — this one script handles all of them.
+    <!-- CONFIRM COMPONENT — OPTION A: MODAL
+         Add data-confirm="Your message here" to ANY <form> or <a> and it
+         will pop this shared modal before letting the action through.
 
          Usage examples:
            <form action="..." method="POST" data-confirm="Are you sure?">
@@ -100,7 +98,7 @@
     </script>
 
     <script>
-        // GLOBAL "ARE YOU SURE?" HANDLER
+        // GLOBAL "ARE YOU SURE?" HANDLER — OPTION A: MODAL
         // Watches the whole page for any form or link with a data-confirm
         // attribute and pops the shared modal before letting the action
         // through. Works automatically on new elements too, since it
@@ -166,6 +164,111 @@
                     pendingElement = null;
                 }
             });
+        })();
+    </script>
+
+    <script>
+        // CONFIRM COMPONENT — OPTION B: TYPE TO CONFIRM
+        // No popup, no hold, no button animation. Add
+        // data-confirm-type="CONFIRM" (or any word) to a <form> or <a>.
+        // Clicking it HIDES the button and replaces it with a text box
+        // right there on the page. The action only fires once the exact
+        // word is typed and the new "Go" button is pressed.
+        //
+        // Usage:
+        //   <form action="..." method="POST" data-confirm-type="SHUFFLE">
+        //       <button type="submit">Shuffle Round</button>
+        //   </form>
+        (function () {
+            document.addEventListener('click', function (e) {
+                const trigger = e.target.closest('[data-confirm-type]') ||
+                                 (e.target.closest('form[data-confirm-type]') ? e.target.closest('form[data-confirm-type]') : null);
+
+                let host = e.target.closest('[data-confirm-type]');
+                if (!host) return;
+                if (host.dataset.typeConfirmed === 'true') return; // already passed, let it through
+                if (host.dataset.typeBuilt === 'true') return; // panel already open, ignore re-clicks on the hidden original
+
+                const isForm = host.tagName === 'FORM';
+                if (isForm) {
+                    // Stop the actual submit; we intercept the button click instead.
+                    if (e.target.closest('button, input[type="submit"]')) {
+                        e.preventDefault();
+                    } else {
+                        return;
+                    }
+                } else {
+                    e.preventDefault();
+                }
+
+                buildPanel(host, isForm);
+            });
+
+            function buildPanel(host, isForm) {
+                const requiredWord = host.getAttribute('data-confirm-type') || 'CONFIRM';
+                host.dataset.typeBuilt = 'true';
+
+                // Hide the original trigger content but keep the element
+                // itself (a <form> or <a>) so its action/href still works.
+                const originalChildren = Array.from(host.childNodes);
+                originalChildren.forEach(function (node) {
+                    if (node.nodeType === 1) node.style.display = 'none';
+                });
+
+                const panel = document.createElement('div');
+                panel.className = 'confirm-type-panel';
+                panel.innerHTML =
+                    '<label class="confirm-type-label">Type <strong>' + requiredWord + '</strong> to proceed</label>' +
+                    '<div class="confirm-type-row">' +
+                        '<input type="text" class="confirm-type-input" autocomplete="off" placeholder="' + requiredWord + '">' +
+                        '<button type="button" class="confirm-type-go" disabled>Go</button>' +
+                        '<button type="button" class="confirm-type-cancel">Cancel</button>' +
+                    '</div>';
+                host.appendChild(panel);
+
+                const input = panel.querySelector('.confirm-type-input');
+                const goBtn = panel.querySelector('.confirm-type-go');
+                const cancelBtn = panel.querySelector('.confirm-type-cancel');
+
+                input.addEventListener('input', function () {
+                    goBtn.disabled = input.value.trim().toUpperCase() !== requiredWord.toUpperCase();
+                });
+
+                input.focus();
+
+                function teardown() {
+                    panel.remove();
+                    originalChildren.forEach(function (node) {
+                        if (node.nodeType === 1) node.style.display = '';
+                    });
+                    delete host.dataset.typeBuilt;
+                }
+
+                cancelBtn.addEventListener('click', function () {
+                    teardown();
+                });
+
+                goBtn.addEventListener('click', function () {
+                    host.dataset.typeConfirmed = 'true';
+                    teardown();
+                    if (isForm) {
+                        host.submit();
+                    } else if (host.tagName === 'A') {
+                        window.location.href = host.href;
+                    } else {
+                        host.click();
+                    }
+                    delete host.dataset.typeConfirmed;
+                });
+
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' && !goBtn.disabled) {
+                        goBtn.click();
+                    } else if (e.key === 'Escape') {
+                        teardown();
+                    }
+                });
+            }
         })();
     </script>
 </body>

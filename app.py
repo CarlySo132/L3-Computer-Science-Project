@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bracket.db'
-app.secret_key = secrets.token_hex(16)
+app.secret_key = 'dev-secret-key-change-this-later'  # needed for session + flash
 db = SQLAlchemy(app)
 
 ALLOWED_SIZES = [4, 8, 16]
@@ -300,7 +300,7 @@ def swap_teams(code):
         match_b.team2_id = team_a_id
 
     match_a.previous_winner_id = None
-    match_b.preivous_winner_id = None
+    match_b.previous_winner_id = None
 
     db.session.commit()
     return redirect(url_for('bracket_created', code=ctx["code"]))
@@ -361,6 +361,7 @@ def remove_winner(match):
         else:
             next_match.team2_id = None
 
+    match.previous_winner_id = match.winner_id
     match.winner_id = None 
     db.session.commit()
     return True
@@ -380,6 +381,24 @@ def undo_winner(match_id, code):
         flash('Uno the later round result first before undoing this match.')
 
     return redirect(url_for('bracket_created', code=code))
+
+@app.route("/redo_winner/<int:match_id>/<code>", methods=["POST"])
+def redo_winenr(match_id, code):
+    match = Match.query.get_or_404(match_id)
+
+    if match.access_code != code.upper():
+        return redirect(url_for('join_bracket'))
+
+    if match.winner_id is not None or match.previous_winner_id is None:
+        return redirect(url_for('bracket_created', code=code))
+
+    match.winner_id = match.previous_winner_id
+    match.previous_winner_id = None
+    db.session.commit()
+
+    advance_winner(match)
+
+    return redirect(url_for('bracket_create', code=code))
 
 @app.route("/rules")
 def rules():
