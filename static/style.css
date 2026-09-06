@@ -1392,3 +1392,110 @@ p {
     text-align: center;
   }
 }
+
+/* Timer */
+.timer-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  background-color: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 24px;
+  padding: clamp(32px, 6vw, 64px) clamp(16px, 4vw, 48px);
+  margin: 2rem 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.timer-display {
+  font-size: clamp(100px, 18vw, 220px);
+  font-weight: 800;
+  color: var(--accent);
+  font-family: var(--font-head);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-display.timer-done {
+  color: var(--red);
+  animation: timer-pulse 1s ease-in-out infinite;
+}
+
+@keyframes timer-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.timer-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.timer-adjust-btn {
+  background-color: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timer-adjust-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.timer-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.timer-start-btn {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  padding: 14px 40px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.timer-start-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 20px var(--accent-dim);
+  opacity: 0.95;
+}
+
+.timer-start-btn:active {
+  transform: translateY(-1px) scale(1.0);
+}
+
+.timer-reset-btn {
+  background-color: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 14px 28px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timer-reset-btn:hover {
+  color: var(--text);
+  border-color: var(--muted);
+  transform: translateY(-2px);
+}
