@@ -310,7 +310,7 @@ p {
 }
 
 .card-content p{
-  color: var(--muted);
+  color: var(--text);
   transform: translateY(-4px);
   transition: transform 0.3s ease;
   text-align: center;
@@ -414,9 +414,15 @@ p {
 }
 
 .accordion-v2 .accordion-item {
+  gap: 10px;
   background-color: var(--card);
-  border: none;
-  margin-bottom: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+}
+
+.accordion-v2 .accordion-button:hover{
+  background-color: var(--bg);
 }
 
 .accordion-v2 .accordion-button {
@@ -1013,9 +1019,9 @@ p {
 }
 
 .code-badge button:hover {
-  background-color: rgba(217, 112, 112, 0.8);
-  transition: background-color 0.3s ease;
-  transform: scale(0.98) 0.3s ease;
+  transform: scale(0.98);
+  opacity: 0.9;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .champion-banner {
@@ -1273,20 +1279,21 @@ p {
 }
 
 .delete-tournament-btn{
-  display: inline-block;
+  background-color: var(--accent);
+  color: white;
+  border: none;
   padding: 10px 20px;
-  background: transparent;
-  color: var(--red);
-  border: 1px solid var(--red);
   border-radius: var(--radius);
-  font-weight: 600;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   cursor: pointer;
-  transition: all 0.2s ease;
+  margin-top: 8px;
 }
 
 .delete-tournament-btn:hover {
-  background-color: var(--red);
-  color: white;
+  opacity: 0.9;
+  transform: translateY(-2px);
 }
 
 /* Undo stuff */
