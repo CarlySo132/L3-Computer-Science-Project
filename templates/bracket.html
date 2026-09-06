@@ -147,13 +147,13 @@
 {% endif %}
 
 {% if tournaments %}
-<div class="tournament-header">
+<div class="tournament-header" id="your-tournaments">
     <h2>Your Tournaments</h2>
     <a href="{{ url_for(request.endpoint, code=code, sort='asc' if sort_order == 'desc' else 'desc') }}" class="sort-toggle-btn">
         {% if sort_order == 'desc' %}
-            <i class="fa-solid fa-arrow-down-wide-short"></i>
+            <i class="fa-solid fa-arrow-down-wide-short"></i> Newest first
         {% else %}
-            <i class="fa-solid fa-arrow-up-wide-short"></i>
+            <i class="fa-solid fa-arrow-up-wide-short"></i> Oldest first
         {% endif %}
     </a>
 </div>
