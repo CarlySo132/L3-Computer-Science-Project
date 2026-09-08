@@ -292,7 +292,7 @@ p {
 
 .card img{
   width: 100%;
-  height: auto;
+  height: 200px;
   object-fit: cover;
   padding: 5px;
   border-radius: 20px;
@@ -806,7 +806,7 @@ p {
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 80px);
-  padding: 2rem 1rem;
+  padding: 1rem 1rem;
 }
 
 .join-card  {
@@ -1061,6 +1061,38 @@ p {
   border-radius: 6px;
   min-width: 200px;
   position: relative;
+}
+
+.preview-champion-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 170px;
+  height: 80px;
+  background-color: var(--accent-dim);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  box-sizing: border-box;
+  padding: 8px 12px;
+}
+
+.preview-champion-box i {
+  color: var(--accent);
+  font-size: 16px;
+}
+
+.preview-champion-box span {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 14px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  line-height: 1.4;
 }
 
 .team {
@@ -1507,4 +1539,28 @@ p {
   opacity: 0.35;
   cursor: not-allowed;
   transform: none;
+}
+
+.flash-messages {
+  margin-bottom: 1.5rem;
+}
+
+.flash-message {
+  padding: 12px 18px;
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.flash-error {
+  background-color: rgba(217, 112, 112, 0.15);
+  border: 1px solid var(--red);
+  color: var(--red);
+}
+
+.flash-success {
+  background-color: rgba(123, 168, 143, 0.15);
+  border: 1px solid var(--green);
+  color: var(--green);
 }

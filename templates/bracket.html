@@ -183,6 +183,15 @@
                         </div>
                     </div>
                     {% endfor %}
+
+                    {% if t.is_complete %}
+                    <div class="round-preview">
+                        <h4>Champion</h4>
+                        <div class="preview-champion-box">
+                            <i class="fa-solid fa-trophy"></i><span>{{ t.final_match.winner.name }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
                 <a href="{{ url_for('bracket_created', code=t.code) }}" class="preview-view-btn">View Bracket</a>
             </div>
