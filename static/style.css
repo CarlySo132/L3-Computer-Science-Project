@@ -1122,8 +1122,8 @@ p {
 }
 
 .btn-secondary {
-  display: inline-block;
-  width: auto;
+  display: block;
+  width: 100%;
   padding: 12px 24px;
   background: transparent;
   color: var(--accent);
@@ -1210,19 +1210,22 @@ p {
 }
 
 .delete-tournament-btn{
-  background-color: var(--accent);
-  color: white;
-  border: none;
-  padding: 10px 20px;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  padding: 10px 22px;
   border-radius: var(--radius);
   font-weight: 700;
-  text-transform: 0.03em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   cursor: pointer;
-  margin-top: 8px;
+  transition: opacity 0.3s ease, transform 0.15s ease
 }
 
 .delete-tournament-btn:hover {
-  opacity: 0.9;
+  background-color: var(--accent);
+  color: white;
   transform: translateY(-2px);
 }
 
@@ -1309,7 +1312,7 @@ p {
 .scoreboard-name {
   background: transparent;
   border: none;
-  color: var(--muted);
+  color: var(--text);
   text-align: center;
   font-size: clamp(13px, 1.6vw, 18px);
   text-transform: uppercase;
@@ -1334,7 +1337,7 @@ p {
 }
 
 .scoreboard-tap-hint {
-  color: var(--muted);
+  color: var(--text);
   font-size: clamp(10px, 1.2vw, 13px);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1342,7 +1345,7 @@ p {
 
 .scoreboard-minus-btn {
   background-color: transparent;
-  color: var(--muted);
+  color: var(--text);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: clamp(4px, 1vw, 8px) clamp(14px, 2vw, 22px);
@@ -1436,7 +1439,7 @@ p {
 
 .timer-adjust-btn {
   background-color: transparent;
-  color: var(--muted);
+  color: var(--text);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 10px 18px;
